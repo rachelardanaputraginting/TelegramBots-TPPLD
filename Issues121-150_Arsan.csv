@@ -1,0 +1,395 @@
+number,title,state,created_at,updated_at,closed_at,body,labels,assignees,milestone,comments
+1132,Bump jackson-databind from 2.13.2.2 to 2.13.4.1,closed,19/10/2022 06:25,8/11/2022 18:46,8/11/2022 18:46,"Bumps [jackson-databind](https://github.com/FasterXML/jackson) from 2.13.2.2 to 2.13.4.1.
+<details>
+<summary>Commits</summary>
+<ul>
+<li>See full diff in <a href=""https://github.com/FasterXML/jackson/commits"">compare view</a></li>
+</ul>
+</details>
+<br />
+
+
+[![Dependabot compatibility score](https://dependabot-badges.githubapp.com/badges/compatibility_score?dependency-name=com.fasterxml.jackson.core:jackson-databind&package-manager=maven&previous-version=2.13.2.2&new-version=2.13.4.1)](https://docs.github.com/en/github/managing-security-vulnerabilities/about-dependabot-security-updates#about-compatibility-scores)
+
+Dependabot will resolve any conflicts with this PR as long as you don't alter it yourself. You can also trigger a rebase manually by commenting `@dependabot rebase`.
+
+[//]: # (dependabot-automerge-start)
+[//]: # (dependabot-automerge-end)
+
+---
+
+<details>
+<summary>Dependabot commands and options</summary>
+<br />
+
+You can trigger Dependabot actions by commenting on this PR:
+- `@dependabot rebase` will rebase this PR
+- `@dependabot recreate` will recreate this PR, overwriting any edits that have been made to it
+- `@dependabot merge` will merge this PR after your CI passes on it
+- `@dependabot squash and merge` will squash and merge this PR after your CI passes on it
+- `@dependabot cancel merge` will cancel a previously requested merge and block automerging
+- `@dependabot reopen` will reopen this PR if it is closed
+- `@dependabot close` will close this PR and stop Dependabot recreating it. You can achieve the same result by closing it manually
+- `@dependabot ignore this major version` will close this PR and stop Dependabot creating any more for this major version (unless you reopen the PR or upgrade to it yourself)
+- `@dependabot ignore this minor version` will close this PR and stop Dependabot creating any more for this minor version (unless you reopen the PR or upgrade to it yourself)
+- `@dependabot ignore this dependency` will close this PR and stop Dependabot creating any more for this dependency (unless you reopen the PR or upgrade to it yourself)
+- `@dependabot use these labels` will set the current labels as the default for future PRs for this repo and language
+- `@dependabot use these reviewers` will set the current reviewers as the default for future PRs for this repo and language
+- `@dependabot use these assignees` will set the current assignees as the default for future PRs for this repo and language
+- `@dependabot use this milestone` will set the current milestone as the default for future PRs for this repo and language
+
+You can disable automated security fix PRs for this repo from the [Security Alerts page](https://github.com/rubenlagus/TelegramBots/network/alerts).
+
+</details>",['dependencies'],[],,1
+1131,Shutting down the bot if an error [409] Conflict was received,open,14/10/2022 15:18,14/10/2022 15:18,,"**Language: Kotlin**
+
+I register a bot ()
+```
+val botSession = botsApi.registerBot(bot)
+```
+
+And at some point, the owner of the bot token, for example, my client, can run the bot on their side.
+
+I need:
+
+1. Or catch the appropriate exception:
+```
+org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException: Error getting updates: [409] Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+	at org.telegram.telegrambots.meta.api.methods.updates.GetUpdates.deserializeResponse(GetUpdates.java:93)
+	at org.telegram.telegrambots.updatesreceivers.DefaultBotSession$ReaderThread.getUpdatesFromServer(DefaultBotSession.java:260)
+	at org.telegram.telegrambots.updatesreceivers.DefaultBotSession$ReaderThread.run(DefaultBotSession.java:189)
+```
+For me to stop the bot on my side.
+
+2. Or automatically stop the pull bot here:
+Package: org.telegram.telegrambots.updatesreceivers
+Class: DefaultBotSession
+Private class: ReaderThread
+Method: getUpdatesFromServer()
+```
+...
+} catch (SocketException | InvalidObjectException | TelegramApiRequestException e) {
+    log.error(e.getLocalizedMessage(), e);
+} 
+...
+```
+
+In any case, it would be great to provide users with the ability to handle errors. Since I found a lot of chat requests - https://t.me/JavaBotsApi. People often ask about this issue.
+
+P. S.: I will add that there is 1 more case: the user can create a bot in BotFather, register its token using the library. The user can then change the bot's token in BotFather. After that, errors will appear in the application - [401] Unauthorized:
+`ERROR o.t.t.u.DefaultBotSession.getUpdatesFromServer - Error getting updates: [401] Unauthorized
+`
+",[],[],,0
+1130,Update README.md,closed,13/10/2022 18:14,31/10/2022 17:25,31/10/2022 17:25,Engrish changes,[],[],,0
+1129,Update Understanding-The-Library.md,closed,13/10/2022 18:08,31/10/2022 17:25,31/10/2022 17:25,Minor Engrish changes,[],[],,0
+1128,Bump shiro-core from 1.9.0 to 1.10.0 in /telegrambots-chat-session-bot,closed,12/10/2022 20:48,31/12/2022 00:56,31/12/2022 00:56,"Bumps [shiro-core](https://github.com/apache/shiro) from 1.9.0 to 1.10.0.
+<details>
+<summary>Commits</summary>
+<ul>
+<li><a href=""https://github.com/apache/shiro/commit/7141f41137f058a3c756ea13ed4e0fef9a3abb66""><code>7141f41</code></a> [maven-release-plugin] prepare release shiro-root-1.10.0</li>
+<li><a href=""https://github.com/apache/shiro/commit/28e10e0ca1cdcd2cede86802fde8464b29265fc8""><code>28e10e0</code></a> Allow for direct configuration of ShiroFilter through WebEnvironment</li>
+<li><a href=""https://github.com/apache/shiro/commit/43240d91590fa6bb20d5eddc1ebb122356595cd4""><code>43240d9</code></a> [SHIRO-890] Avoid another proxy creator when <a href=""https://github.com/EnableAspectJAutoProxy""><code>@​EnableAspectJAutoProxy</code></a> enabled</li>
+<li><a href=""https://github.com/apache/shiro/commit/bfc75e1b56fdbaa3d61b72693c3dcd160c11db6f""><code>bfc75e1</code></a> Merge pull request <a href=""https://github-redirect.dependabot.com/apache/shiro/issues/473"">#473</a> from apache/revert-info-report</li>
+<li><a href=""https://github.com/apache/shiro/commit/41133ec978044ddd55a595c2da237bcabada6bfd""><code>41133ec</code></a> Revert: Bump maven-project-info-reports-plugin from 3.1.2 to 3.4.1</li>
+<li><a href=""https://github.com/apache/shiro/commit/6bf5695d7e50906346fa0472858508e3a54c1284""><code>6bf5695</code></a> Merge pull request <a href=""https://github-redirect.dependabot.com/apache/shiro/issues/471"">#471</a> from apache/update-guava-1-10-x</li>
+<li><a href=""https://github.com/apache/shiro/commit/7bbb0e0c7048f31fbdfe4b9f71519bf2305540cc""><code>7bbb0e0</code></a> Add optional flag to skip dependency check for integration tets</li>
+<li><a href=""https://github.com/apache/shiro/commit/7ac34806abcd61856b798c5d8fffe81b8ca45020""><code>7ac3480</code></a> Update guava to 31.1</li>
+<li><a href=""https://github.com/apache/shiro/commit/b1bd9bad2fd058f399dd534f0ef176817bcf5338""><code>b1bd9ba</code></a> Merge pull request <a href=""https://github-redirect.dependabot.com/apache/shiro/issues/458"">#458</a> from apache/dependabot/maven/1.10.x/org.codehaus.mojo...</li>
+<li><a href=""https://github.com/apache/shiro/commit/5fc85aff1c503e705eb4a60f412e913e73dde0eb""><code>5fc85af</code></a> Merge pull request <a href=""https://github-redirect.dependabot.com/apache/shiro/issues/456"">#456</a> from apache/dependabot/maven/1.10.x/org.apache.maven....</li>
+<li>Additional commits viewable in <a href=""https://github.com/apache/shiro/compare/shiro-root-1.9.0...shiro-root-1.10.0"">compare view</a></li>
+</ul>
+</details>
+<br />
+
+
+[![Dependabot compatibility score](https://dependabot-badges.githubapp.com/badges/compatibility_score?dependency-name=org.apache.shiro:shiro-core&package-manager=maven&previous-version=1.9.0&new-version=1.10.0)](https://docs.github.com/en/github/managing-security-vulnerabilities/about-dependabot-security-updates#about-compatibility-scores)
+
+Dependabot will resolve any conflicts with this PR as long as you don't alter it yourself. You can also trigger a rebase manually by commenting `@dependabot rebase`.
+
+[//]: # (dependabot-automerge-start)
+[//]: # (dependabot-automerge-end)
+
+---
+
+<details>
+<summary>Dependabot commands and options</summary>
+<br />
+
+You can trigger Dependabot actions by commenting on this PR:
+- `@dependabot rebase` will rebase this PR
+- `@dependabot recreate` will recreate this PR, overwriting any edits that have been made to it
+- `@dependabot merge` will merge this PR after your CI passes on it
+- `@dependabot squash and merge` will squash and merge this PR after your CI passes on it
+- `@dependabot cancel merge` will cancel a previously requested merge and block automerging
+- `@dependabot reopen` will reopen this PR if it is closed
+- `@dependabot close` will close this PR and stop Dependabot recreating it. You can achieve the same result by closing it manually
+- `@dependabot ignore this major version` will close this PR and stop Dependabot creating any more for this major version (unless you reopen the PR or upgrade to it yourself)
+- `@dependabot ignore this minor version` will close this PR and stop Dependabot creating any more for this minor version (unless you reopen the PR or upgrade to it yourself)
+- `@dependabot ignore this dependency` will close this PR and stop Dependabot creating any more for this dependency (unless you reopen the PR or upgrade to it yourself)
+- `@dependabot use these labels` will set the current labels as the default for future PRs for this repo and language
+- `@dependabot use these reviewers` will set the current reviewers as the default for future PRs for this repo and language
+- `@dependabot use these assignees` will set the current assignees as the default for future PRs for this repo and language
+- `@dependabot use this milestone` will set the current milestone as the default for future PRs for this repo and language
+
+You can disable automated security fix PRs for this repo from the [Security Alerts page](https://github.com/rubenlagus/TelegramBots/network/alerts).
+
+</details>",['dependencies'],[],,1
+1127,Upgraded to Jackson 2.13.4 to solve CVE-2022-42003 and CVE-2022-42004 vulnerabilities,closed,11/10/2022 13:49,15/11/2022 12:51,15/11/2022 12:51,"Upgraded to **Jackson 2.13.4** to fix CVE-2022-42003 and CVE-2022-42004 vulnerabilities.
+Also upgraded to **JUnit 5.9.0**, **Mockito 4.8.0**, **SLF4J 2.0.3**, and fixed MIT License URL.",[],[],,2
+1126,Bot,closed,3/10/2022 02:42,3/10/2022 07:30,3/10/2022 07:30,"**Is your feature request related to a problem? Please describe.**
+A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+
+**Describe the solution you'd like**
+A clear and concise description of what you want to happen.
+
+**Describe alternatives you've considered**
+A clear and concise description of any alternative solutions or features you've considered.
+
+**Additional context**
+Add any other context or screenshots about the feature request here.
+",[],[],,0
+1125,Can't execute SendMediaGroup,closed,27/9/2022 02:04,28/10/2022 21:05,28/10/2022 21:05,"I am trying to send multiple photos at once but the execute method doesn't accept a sendMediaGroup object? I have seen it used sparingly online but I am not able to reproduce. Am I not using the api correctly?
+
+```
+final SendMediaGroup sendMediaGroup = SendMediaGroup.builder()
+                .chatId(chatId)
+                .medias(mediaPhotos)
+                .build();
+
+        sender.execute(sendMediaGroup);
+```",[],[],,4
+1124,Remove dependency on org.json:json,closed,25/9/2022 11:58,2/1/2023 18:56,31/12/2022 00:55,It is no longer needed and is just an extra vulnerability vector,[],[],,3
+1123,Bots API 6.2 compatibility,closed,21/9/2022 19:12,8/11/2022 20:03,8/11/2022 20:03,"**Describe the bug**
+
+Library version 6.2.0 is still unreleased. Is there any blockers? I see [some changes](c0f51040bb42aa4609399d060c2cec29a66bd093) in dev branch dated August 15th. Is the library still maintained?
+
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Go to https://repo1.maven.org/maven2/org/telegram/telegrambots/
+2. Look for version 6.2.0
+
+**Expected behavior**
+Version 6.2.0 is exists
+
+",[],[],,0
+1121,SendMessage.java issue,open,15/9/2022 21:43,21/9/2022 18:28,,"SendMessage.java and SendMessage.class dont match. .java is more than half less then .class
+![1](https://user-images.githubusercontent.com/82108826/190514019-f5ec894e-e2d3-4845-8d73-6d1a401140c8.png)
+![2](https://user-images.githubusercontent.com/82108826/190514022-6252db71-b1c2-4c0a-a0fb-cab8641f0a9d.png)
+![3](https://user-images.githubusercontent.com/82108826/190514027-f4df63b0-952f-4a85-9dde-1b25780f0027.png)
+",[],[],,4
+1118,Transitive vulnerable dependency org.glassfish.jersey.core:jersey-common:2.33,open,12/9/2022 08:45,12/9/2022 08:45,,"**Describe the bug**
+Provides transitive vulnerable dependency org.glassfish.jersey.core:jersey-common:2.33
+CVE-2021-28168 5.5 Incorrect Permission Assignment for Critical Resource vulnerability pending CVSS allocation
+https://devhub.checkmarx.com/cve-details/CVE-2021-28168",[],[],,0
+1117,"SendAudio, using HTTP URLs as ""audio"" field",open,9/9/2022 18:17,9/9/2022 19:38,,"Hello. While reading api documentation about sending audiofiles I found that the ""audio"" field can be both of type InputFile and String. If it is String, then it should be a url for downloading the audio. In the current realization of SendAudio there is no option to send non-InputFile argument for the audio field. Adding this feature would ease the sending audio process a lot. Thanks.",[],[],,1
+1116,Optimize imports for CreateInvoiceLink and SendInvoice classes,closed,26/8/2022 18:23,24/12/2022 10:09,24/12/2022 10:08,Fixed a bug in the deserializeResponse method of the CreateInvoiceLink class [issues #1115 ](https://github.com/rubenlagus/TelegramBots/issues/1115) And optimized imports for the CreateInvoiceLink and SendInvoice classes,[],[],,0
+1115,"CreateInvoiceLink return string, not message",open,24/8/2022 12:01,25/10/2022 23:08,,"when I'm trying to execute CreateInvoiceLink and get result to variable my code failed with exception
+`Caused by: com.fasterxml.jackson.databind.exc.MismatchedInputException: Cannot construct instance of org.telegram.telegrambots.meta.api.objects.Message (although at least one Creator exists): no String-argument constructor/factory method to deserialize from String value ('https://t.me/invoice_url')
+ at [Source: (String)""{""ok"":true,""result"":""https://t.me/INVOICE_URL""}""; line: 1, column: 21] (through reference chain: org.telegram.telegrambots.meta.api.objects.ApiResponse[""result""])`
+
+it is cause CreateInvoiceLink return string result
+https://core.telegram.org/bots/api#createinvoicelink
+(Use this method to create a link for an invoice. Returns the created invoice link as String on success.)
+
+
+",[],[],,1
+1114,what is causing this problem,open,24/8/2022 08:47,25/8/2022 09:18,,"add dependencies in pom.xml
+```
+ <dependency>
+            <groupId>org.telegram</groupId>
+            <artifactId>telegrambots</artifactId>
+            <version>6.1.0</version>
+        </dependency>
+```
+
+```
+Exception in thread ""main"" java.lang.NoSuchMethodError: 'boolean com.google.common.base.Platform.stringIsNullOrEmpty(java.lang.String)'
+        at com.google.common.base.Strings.isNullOrEmpty(Strings.java:73)
+        at org.telegram.telegrambots.meta.TelegramBotsApi.validateBotUsernameAndToken(TelegramBotsApi.java:109)
+        at org.telegram.telegrambots.meta.TelegramBotsApi.registerBot(TelegramBotsApi.java:61)
+        at com.pusatgps.main.Context.init(Context.java:399)
+        at com.pusatgps.main.main.main(main.java:75)
+```",[],[],,3
+1112,bot.execute(SendDocument) - NullPointerException,closed,21/8/2022 15:22,22/8/2022 08:47,22/8/2022 08:47,"Hi! Please tell me what the problem is.
+
+When trying to send a document (not empty, 250 bytes), I catch a NullPointerException.
+As you can see, I have done validation checks on both InputFile and SendDocument.
+At the same time, there is no problem with sending text messages using the execute method.
+
+ I use telegrambots-spring-boot-starter 6.1.0 and Java 8.
+
+```java
+public BotApiMethod<?> handle(SendMessage sendMessage, Client client) {
+        try {
+            InputFile document = fileService.generateClientDataCsv();
+            document.validate();
+            log.info(""Success validate document"");
+            System.out.println(document.toString());
+            SendDocument sendDocument = SendDocument.builder()
+                    .chatId(client.getChatId())
+                    .document(document)
+                    .build();
+            sendDocument.validate();
+            log.info(""Success validate sendDocument"");
+            System.out.println(sendDocument.toString());
+            telegramBot.execute(sendDocument);
+            sendMessage.setText(""Файл успешно сгенерирован"");
+        } catch (TelegramApiException | NullPointerException e) {
+            sendMessage.setText(""При генерации файла произошла ошибка"");
+            e.printStackTrace();
+        }
+        return sendMessage;
+    }
+```
+
+StackTrace
+```java
+java.lang.NullPointerException
+	at org.telegram.telegrambots.bots.DefaultAbsSender.execute(DefaultAbsSender.java:190)
+	at legal.com.telegrambot.bot.FileRequestHandler.handle(FileRequestHandler.java:51)
+	at legal.com.telegrambot.bot.MessageHandler.handle(MessageHandler.java:101)
+	at legal.com.telegrambot.bot.TelegramFacade.processInputMessage(TelegramFacade.java:108)
+	at legal.com.telegrambot.bot.TelegramFacade.handleUpdate(TelegramFacade.java:49)
+	at legal.com.telegrambot.bot.model.TelegramBot.onWebhookUpdateReceived(TelegramBot.java:43)...
+```
+",[],[],,1
+1111,Custom emoji support,open,20/8/2022 10:51,20/8/2022 10:51,,Telegram release Bot API update 6.2 with custom emoji,[],[],,0
+1108,bot automation telegram script telegram-bot userbot redfox autoforwarder-bot telegram-auto-forwarder telegram-forward-bot auto-forward-message-telegram,closed,10/8/2022 09:19,15/8/2022 00:50,15/8/2022 00:50,,[],[],,0
+1107,Empty log file,open,8/8/2022 20:58,15/8/2022 00:49,,"Empty lines in logs
+![image](https://user-images.githubusercontent.com/38657459/183513106-5c8d92a1-dd6a-469c-8c04-07227b1bd0db.png)
+![image](https://user-images.githubusercontent.com/38657459/183513377-b17b451c-77be-43f6-be24-85ec377cdc8c.png)
+
+",[],[],,1
+1106,[400] Bad Request: wrong file identifier/HTTP URL specified,closed,31/7/2022 09:54,15/8/2022 00:48,15/8/2022 00:48,"Hi, 
+
+Could you please help me to understand why I can't send this video to telegram?
+
+Link to video: https://v.redd.it/0w3soe17hve91/DASH_1080.mp4
+
+**My code**
+```java
+SendVideo sendVideo = SendVideo.builder()
+        .chatId(String.valueOf(CHANNEL_ID))
+        .video(new InputFile(""https://v.redd.it/0w3soe17hve91/DASH_1080.mp4""))
+        .caption(""Some text"")
+        .build();
+
+execute(sendVideo);
+```
+
+**Stack trace**
+```
+Error executing org.telegram.telegrambots.meta.api.methods.send.SendVideo query: [400] Bad Request: wrong file identifier/HTTP URL specified
+	at org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod.deserializeResponseInternal(PartialBotApiMethod.java:53)
+	at org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod.deserializeResponse(PartialBotApiMethod.java:33)
+	at org.telegram.telegrambots.meta.api.methods.send.SendVideo.deserializeResponse(SendVideo.java:99)
+	at org.telegram.telegrambots.bots.DefaultAbsSender.execute(DefaultAbsSender.java:314)
+	at app.funclub.anadearmas.telegram.AnadeArmasFanbot.sendVideo(AnadeArmasFanbot.java:56)
+	at app.funclub.anadearmas.Main.main(Main.java:89)
+```
+
+**Dependency**
+```xml
+<dependency>
+    <groupId>org.telegram</groupId>
+    <artifactId>telegrambots</artifactId>
+    <version>6.1.0</version>
+</dependency>
+```",[],[],,1
+1105,Vulnerable Apache commons-codec dependency,closed,28/7/2022 17:14,9/12/2022 01:54,9/12/2022 01:54,"**Exposure Of Sensitive Information To An Unauthorized Actor**
+Apache commons-codec before 1.13 is vulnerable to information exposure. 
+<a href=""https://advisory.checkmarx.net/advisory/vulnerability/Cxeb68d52e-5509/"">More info</a>",[],[],,0
+1104,Unable to send an animated sticker,open,23/7/2022 15:39,15/8/2022 00:47,,"**Describe the bug**
+I am able to retrieve the `file_path` of a sticker that has been sent into the bot. I can retrieve the InputFile of still-image stickers (`.webp` format) and send it over to the user. However, the same code breaks and cannot send an animated sticker. The retrieved file size is the correct size of the original sticker which suggests that I can correctly retrieve the animated sticker. But the `SendSticker` object is unable to send stickers with the `.tgs` format.
+
+**Expected behavior**
+`SendSticker` object should be able to send animated and non-animated stickers with `.tgs` and `.webp` format respectively.
+
+**Screenshots**
+If applicable, add screenshots to help explain your problem.
+![image](https://user-images.githubusercontent.com/71893643/180612094-676fcefa-3c71-4f75-9b25-e04522c3220d.png)
+
+**Additional context**
+I am using the latest version `v6.1.0`
+",[],[],,1
+1103,User's telegram_id is weider then Integer,closed,23/7/2022 11:14,23/7/2022 11:21,23/7/2022 11:21," o.s.w.s.m.s.DefaultHandlerExceptionResolver [AbstractHandlerExceptionResolver.java:199] Resolved [org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: Numeric value (5448044843) out of range of int (-2147483648 - 2147483647); nested exception is com.fasterxml.jackson.databind.JsonMappingException: Numeric value (5448044843) out of range of int (-2147483648 - 2147483647)
+ at [Source: (PushbackInputStream); line: 2, column: 53] (through reference chain: org.telegram.telegrambots.meta.api.objects.Update[""message""]->org.telegram.telegrambots.meta.api.objects.Message[""from""]->org.telegram.telegrambots.meta.api.objects.User[""id""])]
+
+
+<telegrambots.version>5.0.1</telegrambots.version>
+
+",[],[],,0
+1102,TelegramLongPollingCommandBot: automatically register commands,open,20/7/2022 08:00,21/1/2023 16:06,,"**Is your feature request related to a problem? Please describe.**
+
+it's to complicated to update command list via botFather every time when anyone change source code.
+
+**Describe the solution you'd like**
+
+automatically update command list via https://core.telegram.org/bots/api#setmycommands for all registered commands.
+
+**Describe alternatives you've considered**
+
+-
+**Additional context**
+Add any other context or screenshots about the feature request here.
+",[],[],,4
+1101,How to send multiple pictures？,closed,15/7/2022 10:41,15/8/2022 00:45,15/8/2022 00:45,How to send multiple pictures？,[],[],,2
+1099,Replace dependency definitions with BOMs where possible,closed,10/7/2022 12:19,24/9/2022 16:01,24/9/2022 16:01,Makes dependency version management easier,[],[],,0
+1098,Is it possible to get old message by chat id and message id?,closed,8/7/2022 19:30,11/7/2022 07:31,11/7/2022 07:31,"//it does not work, is there any way to get old message by using message id?
+
+Message n = new Message();
+            n.setChat(new Chat(Long.valueOf(-712581234), ""Private""));
+            n.setMessageId(672);
+            n.getText();",[],[],,1
+1097,Bump shiro-core from 1.9.0 to 1.9.1 in /telegrambots-chat-session-bot,closed,6/7/2022 20:54,15/8/2022 00:56,15/8/2022 00:55,"Bumps [shiro-core](https://github.com/apache/shiro) from 1.9.0 to 1.9.1.
+<details>
+<summary>Commits</summary>
+<ul>
+<li><a href=""https://github.com/apache/shiro/commit/2b532117ac341a47c27ea8c17262e79fe54aee32""><code>2b53211</code></a> [maven-release-plugin] prepare release shiro-root-1.9.1</li>
+<li><a href=""https://github.com/apache/shiro/commit/6bcb92e06fa588b9c7790dd01bc02135d58d3f5b""><code>6bcb92e</code></a> Add support for case-insensitive matching to RegExPatternMatcher</li>
+<li><a href=""https://github.com/apache/shiro/commit/422166dd55195339e811a08a532333e83604bc65""><code>422166d</code></a> Merge pull request <a href=""https://github-redirect.dependabot.com/apache/shiro/issues/364"">#364</a> from apache/shiro-871-19x</li>
+<li><a href=""https://github.com/apache/shiro/commit/0db440a839de1f6bb263c089cdce678c1f241732""><code>0db440a</code></a> Apply principalSuffix only when username does NOT already contain the suffix</li>
+<li><a href=""https://github.com/apache/shiro/commit/a259d268c02861809eb6aa3ec4909b700b699572""><code>a259d26</code></a> fix SHIRO-881</li>
+<li><a href=""https://github.com/apache/shiro/commit/62a663b3280bb35f968695a9976c3fed2e327f01""><code>62a663b</code></a> Merge pull request <a href=""https://github-redirect.dependabot.com/apache/shiro/issues/357"">#357</a> from apache/1-9-parent</li>
+<li><a href=""https://github.com/apache/shiro/commit/9a4f1bf64a963941ea243b33f2c2414bae021384""><code>9a4f1bf</code></a> [SHIRO-882] Upgrade to apache pom parent 26</li>
+<li><a href=""https://github.com/apache/shiro/commit/b3e98b0005b3cc7f3a3d63a382d07e5c5b1cfc43""><code>b3e98b0</code></a> Merge pull request <a href=""https://github-redirect.dependabot.com/apache/shiro/issues/363"">#363</a> from apache/shiro-19-bump-deps</li>
+<li><a href=""https://github.com/apache/shiro/commit/2e88dcfae996233213d7fe67ac079c054c856a69""><code>2e88dcf</code></a> Update Spring, jetty, slf4j, and hazelcast dependencies</li>
+<li><a href=""https://github.com/apache/shiro/commit/f52c3a1e9681139b21785638ce42448a3f16936a""><code>f52c3a1</code></a> Merge pull request <a href=""https://github-redirect.dependabot.com/apache/shiro/issues/361"">#361</a> from apache/another-ci-test</li>
+<li>Additional commits viewable in <a href=""https://github.com/apache/shiro/compare/shiro-root-1.9.0...shiro-root-1.9.1"">compare view</a></li>
+</ul>
+</details>
+<br />
+
+
+[![Dependabot compatibility score](https://dependabot-badges.githubapp.com/badges/compatibility_score?dependency-name=org.apache.shiro:shiro-core&package-manager=maven&previous-version=1.9.0&new-version=1.9.1)](https://docs.github.com/en/github/managing-security-vulnerabilities/about-dependabot-security-updates#about-compatibility-scores)
+
+Dependabot will resolve any conflicts with this PR as long as you don't alter it yourself. You can also trigger a rebase manually by commenting `@dependabot rebase`.
+
+[//]: # (dependabot-automerge-start)
+[//]: # (dependabot-automerge-end)
+
+---
+
+<details>
+<summary>Dependabot commands and options</summary>
+<br />
+
+You can trigger Dependabot actions by commenting on this PR:
+- `@dependabot rebase` will rebase this PR
+- `@dependabot recreate` will recreate this PR, overwriting any edits that have been made to it
+- `@dependabot merge` will merge this PR after your CI passes on it
+- `@dependabot squash and merge` will squash and merge this PR after your CI passes on it
+- `@dependabot cancel merge` will cancel a previously requested merge and block automerging
+- `@dependabot reopen` will reopen this PR if it is closed
+- `@dependabot close` will close this PR and stop Dependabot recreating it. You can achieve the same result by closing it manually
+- `@dependabot ignore this major version` will close this PR and stop Dependabot creating any more for this major version (unless you reopen the PR or upgrade to it yourself)
+- `@dependabot ignore this minor version` will close this PR and stop Dependabot creating any more for this minor version (unless you reopen the PR or upgrade to it yourself)
+- `@dependabot ignore this dependency` will close this PR and stop Dependabot creating any more for this dependency (unless you reopen the PR or upgrade to it yourself)
+- `@dependabot use these labels` will set the current labels as the default for future PRs for this repo and language
+- `@dependabot use these reviewers` will set the current reviewers as the default for future PRs for this repo and language
+- `@dependabot use these assignees` will set the current assignees as the default for future PRs for this repo and language
+- `@dependabot use this milestone` will set the current milestone as the default for future PRs for this repo and language
+
+You can disable automated security fix PRs for this repo from the [Security Alerts page](https://github.com/rubenlagus/TelegramBots/network/alerts).
+
+</details>",['dependencies'],[],,1
