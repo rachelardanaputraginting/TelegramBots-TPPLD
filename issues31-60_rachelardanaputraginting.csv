@@ -1,0 +1,581 @@
+number,title,state,created_at,updated_at,closed_at,body,labels,assignees,milestone,comments
+1232,Why telegrambots:6.6.0 not found on mvnrepository and jitpack?,closed,2023-06-09 06:59:00,2023-06-18 09:43:18,2023-06-18 09:43:18,"API 6.6.0 is released, but I can't add it to the dependencies. 6.5.0 works fine
+
+Gradle-8.1.1
+jdk - temurin-20.0.1
+
+build.gradle
+```gradle
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.1.0'
+    id 'io.spring.dependency-management' version '1.1.0'
+}
+
+group = '...'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+repositories {
+   // see screenshoots
+}
+
+dependencies {
+   // see screenshoots
+} 
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+```
+
+```java
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Import;
+import org.telegram.telegrambots.starter.TelegramBotStarterConfiguration;
+
+@Import({TelegramBotStarterConfiguration.class})
+@SpringBootApplication
+public class BotApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(BotApplication.class, args);
+    }
+
+}
+```
+
+mvnrepository:
+![image](https://github.com/rubenlagus/TelegramBots/assets/19995957/f5ecf402-07d7-4f1a-ba54-f45ff0765a73)
+
+jitpack:
+![image](https://github.com/rubenlagus/TelegramBots/assets/19995957/6562b718-6208-4a05-82be-d880d099dd3f)",[],[],,1
+1231,"Tune HttpClient settings, to use `setMaxConnPerRoute()` instead of `setMaxConnTotal()`",open,2023-05-30 21:16:21,2023-05-30 21:16:21,,"**Describe the bug**
+Currently, `.setMaxConnTotal(100)` is used in https://github.com/rubenlagus/TelegramBots/blob/79ecff72243097f688ca42df6541869f02ce9db6/telegrambots/src/main/java/org/telegram/telegrambots/facilities/TelegramHttpClientBuilder.java#L30.
+This is a global connection count limit. There is second setting - `setMaxConnPerRoute`: https://hc.apache.org/httpcomponents-client-4.5.x/current/httpclient/apidocs/org/apache/http/impl/client/HttpClientBuilder.html#setMaxConnPerRoute(int).
+As in case of telegram bot baseUrl is always the same, the second setting hits limit earlier than first one.
+As the default value is `2`, this means, that only 2 requests could be performed simultaneously. 
+
+
+**To Reproduce**
+Here is the quick test, to check, that this limit hits faster:
+```
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.concurrent.CompletableFuture;
+
+import static java.text.MessageFormat.format;
+import static org.apache.http.impl.client.HttpClients.createDefault;
+
+public class HttpConnectionPerRoute {
+
+    public static void main(String[] args) throws InterruptedException {
+
+        CloseableHttpClient httpClient = createDefault();
+
+        CompletableFuture.runAsync(() -> execute(httpClient));
+        CompletableFuture.runAsync(() -> execute(httpClient));
+        CompletableFuture.runAsync(() -> execute(httpClient));
+        CompletableFuture.runAsync(() -> execute(httpClient));
+
+        Thread.sleep(10_000);
+    }
+
+    private static void execute(CloseableHttpClient httpClient) {
+        System.out.println(format(""Before:[{0}] {1}"", Thread.currentThread(), LocalDateTime.now()));
+        HttpGet request = new HttpGet(""https://httpbin.org/delay/2"");
+
+        try (var ignored = httpClient.execute(request)) {
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println(format(""After:[{0}] {1}"", Thread.currentThread(), LocalDateTime.now()));
+    }
+}
+```
+Here we making 4 concurreny http requests to the endpoint with 2-seconds-delay before response, expecting them to run simultaneously.
+And here is output:
+```
+Before:[Thread[ForkJoinPool.commonPool-worker-3,5,main]] 2023-05-31T01:04:01.719964900
+Before:[Thread[ForkJoinPool.commonPool-worker-4,5,main]] 2023-05-31T01:04:01.719964900
+Before:[Thread[ForkJoinPool.commonPool-worker-2,5,main]] 2023-05-31T01:04:01.719964900
+Before:[Thread[ForkJoinPool.commonPool-worker-1,5,main]] 2023-05-31T01:04:01.719964900
+After:[Thread[ForkJoinPool.commonPool-worker-1,5,main]] 2023-05-31T01:04:05.059605200
+After:[Thread[ForkJoinPool.commonPool-worker-3,5,main]] 2023-05-31T01:04:05.192477400
+After:[Thread[ForkJoinPool.commonPool-worker-4,5,main]] 2023-05-31T01:04:08.837098200
+After:[Thread[ForkJoinPool.commonPool-worker-2,5,main]] 2023-05-31T01:04:08.872193
+```
+
+As we can see, 2 later requests are waiting first 2 to complete, before executing. The same happends with telegram requests.
+If request taking a long time (for example, `sendVideo` requests), others are waiting. And current default - `2` is very low.",[],[],,0
+1230,Problem with proxy,open,2023-05-30 17:32:46,2023-05-31 19:32:26,,"Hi all! My bot not start with proxy...There are my code:
+
+
+
+`@Component`
+`@RequiredArgsConstructor`
+`public class BotInit {`
+    `private final TelegramBot telegramBot;`
+   ` @EventListener({ContextRefreshedEvent.class})`
+   `public void init() throws TelegramApiException {`
+`       TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);`
+      `  try{`
+         `  telegramBot.getOptions().setProxyHost(""192.168.0.254"");`
+        `   telegramBot.getOptions().setProxyPort(2121);`
+        `    telegramBot.getOptions().setProxyType(DefaultBotOptions.ProxyType.HTTP);`
+        `              telegramBotsApi.registerBot(telegramBot);`
+      `  } catch (TelegramApiException e){`
+         `   e.printStackTrace();`
+      ` }`
+   `}`
+`}`
+
+My exception - it's 
+This host is unknown (api.telegram.org)
+How i can fix this? Thank you.
+",[],[],,1
+1229,Api version 6.6,closed,2023-05-30 00:32:50,2023-05-30 00:33:09,2023-05-30 00:33:08,Api version 6.6,[],[],,0
+1228,Fix Telegram bot is not running in Spring 3.1.0 #1226,open,2023-05-29 21:50:51,2023-06-12 19:21:31,,fix [#1226](https://github.com/rubenlagus/TelegramBots/issues/1226),[],[],,1
+1227,How to specify the robot account to send messages when registering multiple robots,closed,2023-05-28 14:48:36,2023-05-31 01:52:55,2023-05-31 01:52:55,"telegrambots library version: 6.5.0
+
+1、I registered  three bots ,but only one onUpdateReceived method,When calling execute, all three robots have sent messages. I want to specify how to send messages to the second robot?
+
+2、For example, the update message of the second robot, when the execute method is called, only the second robot can send the message, and other robots should remain silent 
+
+3、I checked the attributes in the update entity, and found no information about which robot update message it belongs to.
+
+![image](https://github.com/rubenlagus/TelegramBots/assets/32320103/5de0428c-bf42-412f-94dc-8a49024bde0c)
+",[],[],,0
+1226,Telegram bot is not running in Spring 3.1.0,closed,2023-05-28 11:54:32,2023-06-24 03:08:15,2023-06-24 03:08:15,"**Describe the bug**
+Hi! I can't see when telegram bot is running in spring. He's just start and stoping.
+
+**Code**
+
+``` java 
+package kz.tiger.zone.tigerzoneshopbot.bot;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.objects.Update;
+
+@Component
+@Slf4j
+public class ShopBot extends TelegramLongPollingBot {
+    private final String botUsername;
+
+    public ShopBot(@Value(""${bot.username}"") String botUsername,
+                   @Value(""${bot.token}"") String botToken) {
+        super(botToken);
+        this.botUsername = botUsername;
+    }
+
+    @Override
+    public void onUpdateReceived(Update update) {
+        log.info(""Work!"");
+    }
+
+    @Override
+    public String getBotUsername() {
+        return botUsername;
+    }
+}
+
+```
+
+**LOG**
+```
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.1.0)
+
+2023-05-28T17:50:08.302+06:00  INFO 28032 --- [           main] k.t.z.t.TigerZoneShopBotApplication      : Starting TigerZoneShopBotApplication using Java 17.0.7 with PID 28032 (D:\develop\projects\tiger-zone-shop-bot\build\classes\java\main started by Legion in D:\develop\projects\tiger-zone-shop-bot)
+2023-05-28T17:50:08.305+06:00  INFO 28032 --- [           main] k.t.z.t.TigerZoneShopBotApplication      : No active profile set, falling back to 1 default profile: ""default""
+2023-05-28T17:50:08.671+06:00  INFO 28032 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2023-05-28T17:50:08.692+06:00  INFO 28032 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 13 ms. Found 0 JPA repository interfaces.
+2023-05-28T17:50:08.988+06:00  INFO 28032 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2023-05-28T17:50:09.226+06:00  INFO 28032 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@40712ee9
+2023-05-28T17:50:09.229+06:00  INFO 28032 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2023-05-28T17:50:09.294+06:00  INFO 28032 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2023-05-28T17:50:09.365+06:00  INFO 28032 --- [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.2.2.Final
+2023-05-28T17:50:09.366+06:00  INFO 28032 --- [           main] org.hibernate.cfg.Environment            : HHH000406: Using bytecode reflection optimizer
+2023-05-28T17:50:09.505+06:00  INFO 28032 --- [           main] o.h.b.i.BytecodeProviderInitiator        : HHH000021: Bytecode provider name : bytebuddy
+2023-05-28T17:50:09.643+06:00  INFO 28032 --- [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2023-05-28T17:50:09.694+06:00  INFO 28032 --- [           main] org.hibernate.orm.dialect                : HHH035001: Using dialect: org.hibernate.dialect.PostgreSQLDialect, version: org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$DialectResolutionInfoImpl@50b0afd7
+2023-05-28T17:50:09.872+06:00  INFO 28032 --- [           main] o.h.b.i.BytecodeProviderInitiator        : HHH000021: Bytecode provider name : bytebuddy
+2023-05-28T17:50:10.046+06:00  INFO 28032 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2023-05-28T17:50:10.050+06:00  INFO 28032 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-05-28T17:50:10.425+06:00  INFO 28032 --- [           main] k.t.z.t.TigerZoneShopBotApplication      : Started TigerZoneShopBotApplication in 2.495 seconds (process running for 3.068)
+2023-05-28T17:50:10.430+06:00  INFO 28032 --- [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-05-28T17:50:10.432+06:00  INFO 28032 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2023-05-28T17:50:10.439+06:00  INFO 28032 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+```
+
+**Information**
+ - Spring version: 3.1.0
+ - Version starter 6.5.0",[],[],,11
+1225,Bump spring-boot-autoconfigure from 2.7.5 to 2.7.12 in /telegrambots-spring-boot-starter,closed,2023-05-26 22:14:21,2023-06-11 12:34:29,2023-06-11 12:34:27,"Bumps [spring-boot-autoconfigure](https://github.com/spring-projects/spring-boot) from 2.7.5 to 2.7.12.
+<details>
+<summary>Release notes</summary>
+<p><em>Sourced from <a href=""https://github.com/spring-projects/spring-boot/releases"">spring-boot-autoconfigure's releases</a>.</em></p>
+<blockquote>
+<h2>v2.7.12</h2>
+<h2>:lady_beetle: Bug Fixes</h2>
+<ul>
+<li>Welcome page may return a 404 when an acceptable response cannot be produced <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35552"">#35552</a></li>
+<li>Invalid reference format error when tagging images using Podman <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35358"">#35358</a></li>
+<li><code>FactoryBean.getObject</code> for non-singleton executed when resetting mocks <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35324"">#35324</a></li>
+<li>Can't use PEM encoded PKCS#8 EC keys with server.ssl.certificate-private-key <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35322"">#35322</a></li>
+<li>Webflux server gracefulshutdown throws NullPointerException <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35264"">#35264</a></li>
+<li>Health actuator mail details shows the port as -1 when using the default port <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35247"">#35247</a></li>
+<li>SessionRepositoryFilterConfiguration can cause early initialization of SessionRepository beans including Redis <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35240"">#35240</a></li>
+<li>Devtools main method search algorithm can find incorrect main method <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35214"">#35214</a></li>
+<li>When a WebFlux app is deployed to Cloud Foundry some metrics are lost and numerous beans are ineligible for post-processing <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35163"">#35163</a></li>
+<li>Liveness and readiness probes return down when lazy initialization is enabled <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35161"">#35161</a></li>
+<li>Treating a null Flyway-specific password as an empty string prevents the use of PGPASS for authentication <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35110"">#35110</a></li>
+<li>WebClient auto-configuration tries to use HttpComponentsClientHttpConnector when all required classes are not present <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/34964"">#34964</a></li>
+<li>MinIdle and MaxValidationTime properties missing for R2DBC pools <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/34724"">#34724</a></li>
+</ul>
+<h2>:notebook_with_decorative_cover: Documentation</h2>
+<ul>
+<li>Polish formatting of permitAll() endpoint security Kotlin example <a href=""https://redirect.github.com/spring-projects/spring-boot/pull/35454"">#35454</a></li>
+<li>Wrong anchors in Maven plugin documentation <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35371"">#35371</a></li>
+<li>Correct list of annotations that are equivalent to <code>@SpringBootApplication</code> <a href=""https://redirect.github.com/spring-projects/spring-boot/pull/35180"">#35180</a></li>
+<li>Harmonize references to application.yaml files in reference docs <a href=""https://redirect.github.com/spring-projects/spring-boot/pull/34628"">#34628</a></li>
+</ul>
+<h2>:hammer: Dependency Upgrades</h2>
+<ul>
+<li>Upgrade to Elasticsearch 7.17.10 <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35339"">#35339</a></li>
+<li>Upgrade to Hazelcast 5.1.6 <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35440"">#35440</a></li>
+<li>Upgrade to Johnzon 1.2.20 <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35340"">#35340</a></li>
+<li>Upgrade to Json-smart 2.4.11 <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35549"">#35549</a></li>
+<li>Upgrade to Micrometer 1.9.11 <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35290"">#35290</a></li>
+<li>Upgrade to Netty 4.1.92.Final <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35441"">#35441</a></li>
+<li>Upgrade to Reactor Bom 2020.0.32 <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35291"">#35291</a></li>
+<li>Upgrade to Spring Data Bom 2021.2.12 <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35292"">#35292</a></li>
+<li>Upgrade to Spring Integration 5.5.18 <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35294"">#35294</a></li>
+<li>Upgrade to Tomcat 9.0.75 <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35442"">#35442</a></li>
+</ul>
+<h2>:heart: Contributors</h2>
+<p>Thank you to all the contributors who worked on this release:</p>
+<p><a href=""https://github.com/JunJaBoy""><code>@​JunJaBoy</code></a>, <a href=""https://github.com/aasaru""><code>@​aasaru</code></a>, <a href=""https://github.com/davin111""><code>@​davin111</code></a>, and <a href=""https://github.com/ivandimitrov8080""><code>@​ivandimitrov8080</code></a></p>
+<h2>v2.7.11</h2>
+<h2>:lady_beetle: Bug Fixes</h2>
+<ul>
+<li>CloudFoundry integration does not use endpoint path mappings <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35085"">#35085</a></li>
+<li>Gradle Spring Boot plugin with Kotlin DSL does not support includeProjectDependencies in bootJar &gt; layered &gt; dependencies configuration <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/35033"">#35033</a></li>
+<li>Banner placeholders use default values too soon <a href=""https://redirect.github.com/spring-projects/spring-boot/pull/34764"">#34764</a></li>
+<li>Cassandra default configuration substitutions don't resolve against configuration derived from spring.data.cassandra properties <a href=""https://redirect.github.com/spring-projects/spring-boot/issues/34643"">#34643</a></li>
+</ul>
+<!-- raw HTML omitted -->
+</blockquote>
+<p>... (truncated)</p>
+</details>
+<details>
+<summary>Commits</summary>
+<ul>
+<li><a href=""https://github.com/spring-projects/spring-boot/commit/64157f2afc1a9e89da4148c62844fe7d5618b412""><code>64157f2</code></a> Release v2.7.12</li>
+<li><a href=""https://github.com/spring-projects/spring-boot/commit/418dd1ba5bdad79b55a043000164bfcbda2acd78""><code>418dd1b</code></a> Return 406 status code if welcome page is not accepted</li>
+<li><a href=""https://github.com/spring-projects/spring-boot/commit/cc2bb7cade622873d353be2c675ee6407fee4a94""><code>cc2bb7c</code></a> Upgrade to Json-smart 2.4.11</li>
+<li><a href=""https://github.com/spring-projects/spring-boot/commit/c0797eea1d286d621687ce0820a40b225223b907""><code>c0797ee</code></a> Upgrade CI to Docker 24.0.0</li>
+<li><a href=""https://github.com/spring-projects/spring-boot/commit/1cd3a32f1ff579ea5a7d416e43e7a37fddc618ca""><code>1cd3a32</code></a> Merge branch '2.6.x' into 2.7.x</li>
+<li><a href=""https://github.com/spring-projects/spring-boot/commit/7f9fd042fb38a390d9835bae119c8764d2066c18""><code>7f9fd04</code></a> Upgrade to Undertow 2.2.24.Final</li>
+<li><a href=""https://github.com/spring-projects/spring-boot/commit/47f1fc57d9a34cb3da6ddc0157fba13c379a075f""><code>47f1fc5</code></a> Upgrade to Tomcat 9.0.75</li>
+<li><a href=""https://github.com/spring-projects/spring-boot/commit/2e8ec62cd43a95d66672cf9ff793ad781536ddff""><code>2e8ec62</code></a> Upgrade to Thymeleaf Extras SpringSecurity 3.0.5.RELEASE</li>
+<li><a href=""https://github.com/spring-projects/spring-boot/commit/ba7485bf48743beea994c9e70e542fbd8b0d3590""><code>ba7485b</code></a> Upgrade to Spring WS 3.1.6</li>
+<li><a href=""https://github.com/spring-projects/spring-boot/commit/1e5797f3502f9e26bb3b7f76ad48f016fa7816e9""><code>1e5797f</code></a> Upgrade to Spring Security 5.6.10</li>
+<li>Additional commits viewable in <a href=""https://github.com/spring-projects/spring-boot/compare/v2.7.5...v2.7.12"">compare view</a></li>
+</ul>
+</details>
+<br />
+
+
+[![Dependabot compatibility score](https://dependabot-badges.githubapp.com/badges/compatibility_score?dependency-name=org.springframework.boot:spring-boot-autoconfigure&package-manager=maven&previous-version=2.7.5&new-version=2.7.12)](https://docs.github.com/en/github/managing-security-vulnerabilities/about-dependabot-security-updates#about-compatibility-scores)
+
+Dependabot will resolve any conflicts with this PR as long as you don't alter it yourself. You can also trigger a rebase manually by commenting `@dependabot rebase`.
+
+[//]: # (dependabot-automerge-start)
+[//]: # (dependabot-automerge-end)
+
+---
+
+<details>
+<summary>Dependabot commands and options</summary>
+<br />
+
+You can trigger Dependabot actions by commenting on this PR:
+- `@dependabot rebase` will rebase this PR
+- `@dependabot recreate` will recreate this PR, overwriting any edits that have been made to it
+- `@dependabot merge` will merge this PR after your CI passes on it
+- `@dependabot squash and merge` will squash and merge this PR after your CI passes on it
+- `@dependabot cancel merge` will cancel a previously requested merge and block automerging
+- `@dependabot reopen` will reopen this PR if it is closed
+- `@dependabot close` will close this PR and stop Dependabot recreating it. You can achieve the same result by closing it manually
+- `@dependabot ignore this major version` will close this PR and stop Dependabot creating any more for this major version (unless you reopen the PR or upgrade to it yourself)
+- `@dependabot ignore this minor version` will close this PR and stop Dependabot creating any more for this minor version (unless you reopen the PR or upgrade to it yourself)
+- `@dependabot ignore this dependency` will close this PR and stop Dependabot creating any more for this dependency (unless you reopen the PR or upgrade to it yourself)
+You can disable automated security fix PRs for this repo from the [Security Alerts page](https://github.com/rubenlagus/TelegramBots/network/alerts).
+
+</details>",['dependencies'],[],,1
+1224,set false as default value for Use#ispremium,closed,2023-05-21 19:56:03,2023-05-30 05:14:10,2023-05-30 01:38:29,fix #1223,[],[],,3
+1223,User#getIsPremium return null instead of false,closed,2023-05-21 19:52:06,2023-05-30 01:38:11,2023-05-30 01:38:11,"**Describe the bug**
+
+User#getIsPremium return null instead of false
+
+**Expected behavior**
+
+User#getIsPremium return false when user doesn't have premium subscription",[],[],,1
+1222,How to associate user replies with messages,open,2023-05-18 19:58:16,2023-07-03 12:58:37,,"For example:
+Bot: Please enter your recharge amount?
+user: 20
+But I got this 20. It's just an ordinary piece of news. It's not related to what the robot said",[],[],,3
+1221, o.t.t.u.DefaultBotSession$ReaderThread   : Error getting updates: [409] Conflict: terminated by other getUpdates request; make sure that only one bot instance is running,closed,2023-05-14 06:22:50,2023-05-14 06:51:25,2023-05-14 06:51:25,"Hy everyone.
+I have this error when I use a Telegram bot extending from LongPollingTelegram.
+I am sure that i have only one instance of my bot in work.
+My bot is written in SpringBoot version 2.6.4, java version 1.8.0_271, which is deployed on tomcat version 9.0.56 under linux.
+I used the following dependencies for the Telegram bot :
+`       <dependency>
+		<groupId>org.telegram</groupId>
+		<artifactId>telegrambots-spring-boot-starter</artifactId>
+		<version>5.6.0</version>
+	</dependency>
+	<dependency>
+		<groupId>org.telegram</groupId>
+		<artifactId>telegrambots</artifactId>
+		<version>5.6.0</version>
+	</dependency>`
+
+I use the following code to initialize my bot :
+
+ `@EventListener({ContextRefreshedEvent.class}) 
+  public void init() throws TelegramApiException{
+         consoleLogger.info(""Start initializer MediaBot ."");
+         TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
+         try{ 
+                BotSession session = telegramBotsApi.registerBot(bot);
+                bot.setSession(session);
+          } catch (TelegramApiException e) { 
+                consoleLogger.error(""Error occurred: "" + e.getMessage());
+          }
+ }`
+
+And my bean of bot has the following PreDestroy method to close and release all resources:
+
+` @PreDestroy 
+  public void preDestroy(){
+          consoleLogger.info(""Stop bots session .""); 
+          this.onClosing(); 
+          this.getSession().stop(); 
+          consoleLogger.error(""Bot session was stopped .""); 
+ }`
+
+But when I deploy my bot from tomcat, I get the following error : 
+
+> [gram Connection] o.t.t.u.DefaultBotSession$ReaderThread   : Error getting updates: [409] Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException: Error getting updates: [409] Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+	at org.telegram.telegrambots.meta.api.methods.updates.GetUpdates.deserializeResponse(GetUpdates.java:93) ~[telegrambots-meta-5.6.0.jar:?]
+	at org.telegram.telegrambots.updatesreceivers.DefaultBotSession$ReaderThread.getUpdatesFromServer(DefaultBotSession.java:260) ~[telegrambots-5.6.0.jar:?]
+	at org.telegram.telegrambots.updatesreceivers.DefaultBotSession$ReaderThread.run(DefaultBotSession.java:189) [telegrambots-5.6.0.jar:?]
+
+And this error repeats every second.
+BUT the most interesting thing is that my bot still partially works after undeploying.
+So, what am I doing wrong? I can't figure it out.
+The support of Telegram is not answer for my email.",[],[],,2
+1220,Update Getting-Started.md,open,2023-05-12 19:02:21,2023-05-12 19:02:21,,Update Getting-Started.md to show the use of Constructor to pass bot-token instead of using the deprecated getBotToken() method.,[],[],,0
+1219,/wiki/Getting-Started needs to be updated,open,2023-05-12 18:52:07,2023-05-12 19:16:04,,"[/wiki/Getting-Started](https://github.com/rubenlagus/TelegramBots/wiki/Getting-Started) needs to be Updated to call the constructor to pass the token instead of calling getBotToken() since it's deprecated.
+
+Here are the changes:
+```
+	public MyAmazingBot() {
+		super(""Your Token"");
+	}
+```
+
+![Issue image](https://github.com/rubenlagus/TelegramBotsExample/assets/38118279/26b2299f-ddee-441f-85f9-4e8b9fe6c64d)",[],[],,1
+1218,Yes,closed,2023-05-11 09:02:49,2023-05-30 01:38:37,2023-05-30 01:38:37,"**Describe the bug**
+A clear and concise description of what the bug is.
+
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Go to '...'
+2. Click on '....'
+3. Scroll down to '....'
+4. See error
+
+**Expected behavior**
+A clear and concise description of what you expected to happen.
+
+**Screenshots**
+If applicable, add screenshots to help explain your problem.
+
+**Desktop (please complete the following information):**
+ - OS: [e.g. iOS]
+ - Browser [e.g. chrome, safari]
+ - Version [e.g. 22]
+
+**Smartphone (please complete the following information):**
+ - Device: [e.g. iPhone6]
+ - OS: [e.g. iOS8.1]
+ - Browser [e.g. stock browser, safari]
+ - Version [e.g. 22]
+
+**Additional context**
+Add any other context about the problem here.",[],[],,1
+1217,TelegramLongPollingCommandBot: pass token into constructor,closed,2023-05-04 14:54:37,2023-06-05 03:48:56,2023-06-05 03:48:56,"Deprecated old constructor (without botToken in parameters), added constructors where botToken can be passed.",[],[],,0
+1215,Request Entity Too Large,closed,2023-05-03 13:12:35,2023-05-25 17:16:08,2023-05-25 00:38:58,"I sent a video with a size of 3285932 bytes, and an error occurred. The request body is too large. How can I solve it?",[],[],,3
+1214,Create Bits,closed,2023-05-02 08:51:55,2023-08-19 13:32:11,2023-08-19 13:32:11,,[],[],,0
+1213,Return default constructors and botToken for DefaultAbsSender,closed,2023-04-21 07:15:46,2023-06-13 12:07:48,2023-06-13 12:07:48,"Issue #1167 initiated and deprecated the default constructors (no arguments) and method getBotToken() for DefaultAbsSender.
+@Chase22, when he initiated the change, most likely did not think that, in addition to SpringBoot, this library can be used in an EJB environment in which default constructors are needed to work when using the @EJB annotation.
+If the default constructors are permanently removed, then a sufficient array of applications that use EJB along with your library, but do not advertise it from all angles (as those who write in Spring do), can no longer use this library, but rewrite under Spring is quite expensive and will take much more time.",[],[],,0
+1212,Upload documents progress bar / status code,open,2023-04-16 20:11:34,2023-04-16 20:11:34,,"# Upload documents progress bar / status code
+## The issue
+Hi everybody, I was building my Telegram Bot when I faced in the following problem.
+I was using local Telegram API Server because I needed to upload large file, the upload seems to work fine, but the large size of the file and obviously the amount of time needed to upload it, all this made the request (sendDocument method) return an exception due to idleTimeout (Sockets wait too much for file fully upload).
+
+## How know I manage it
+So now the only way for me to see if the file has been uploaded, it is to just wait the file appear in the chat.
+
+## How I would be able to manage it
+I would like to have some sort of progress bar or callback query with the percentage of file sent, or it could be just fine a response from the server when a file has been uploaded.
+
+### Thanks
+If anyone know how to help me I would be really thankfully,
+",[],[],,0
+1211,Change replies order logic,closed,2023-04-12 22:32:36,2023-05-27 16:12:56,2023-05-27 16:12:56,"Hi!
+
+Current version **telegrambots-abilities** doesn't support consistent dialogue with user.
+
+If we create reply chain logic in ReplyFlow, every next reply will lie in List after parent reply.
+It's logical, of course, but let's look at an example:
+
+Let's say we have 3-state-reply-chain chat with user which will be built, for example, like this:
+
+```
+ReplyFlow.builder(dbContext)
+                 .action((bot, update) -> bot.silent().send(""Hi!"", getChatId(update)))
+                 .onlyIf(hasMessageWith(""Hi""))
+                 .next(ReplyFlow.builder(dbContext)
+                                .action((bot, update) -> bot.silent().send(""How are you?"", getChatId(update)))
+                                .next(ReplyFlow.builder(dbContext)
+                                               .action((bot, update) -> bot.silent().send(""Wow"", getChatId(update)))
+                                               .build())
+                                .build())
+                 .build();
+```
+
+In this example only one hand added condition for first state.
+ReplyFlow also will add ID state check:
+
+```
+// From current version ReplyFlow:126
+statefulConditions.add(0, upd -> {
+        Long chatId = AbilityUtils.getChatId(upd);
+        int stateId = db.<Long, Integer>getMap(STATES).getOrDefault(chatId, -1);
+        return id == stateId;
+      });
+```
+
+But if we enter the first state, bot won't wait user answer and send all messages from ReplyFlow chain.
+
+i.e the dialogue will look like (U - User, B - Bot):
+**U**: Hi, bot!
+**B**: Hi!
+**B**: How are you?
+**B**: Wow
+
+In common case if we don't have any rules for inner ReplyFlow's for various reasons, we will jump between states after one user message.
+And the reason is that next reply lies after parent reply in common replies List in ```BaseAbilityBot```.",[],[],,0
+1208,"when user sends a group of photos to bot,how can bot get all the information of  photos?now i can only get the first photo`s info",open,2023-04-02 06:52:09,2023-04-02 13:37:07,,"            List<PhotoSize> photo = message.getPhoto();
+            String fileId = photo.get(0).getFileId();
+            String caption = message.getCaption();",[],[],,0
+1207,JakartaEE JCA Inbound & outbond adapter,open,2023-04-01 08:47:01,2023-04-01 08:47:01,,"**Is your feature request related to a problem? Please describe.**
+I started a project named jca-telegram . [https://github.com/JavaEE-JCA/jca-telegram] (https://github.com/JavaEE-JCA/jca-telegram)
+this project used on JavaEE/JakartaEE framework as JCA inbound/outbond adapter .    
+I don't have enough time to develop this project .
+
+**Describe the solution you'd like**
+this is so good if you add a some description on your README to Programmers get to know this project and help me for develop and add new features to this project .",[],[],,0
+1206,"Hello, how can I let the robot automatically know that a new user has joined the group?",open,2023-03-29 07:27:10,2023-08-21 03:26:52,,"Hello, how can I let the robot automatically know that a new user has joined the group?
+I want to implement the function that the BOT sends a verification code for the user to verify after the new user joins the group",[],[],,2
+1204,"how to make a group link to share , and user click this link ,i can take it?",open,2023-03-18 09:28:00,2023-08-21 03:28:08,,"i have a group , i think to make a link , like (https://t.me/group_link?invite=abc), users click the link to join my group . how to catch the invite？
+",[],[],,1
+1203,Caused by: javax.net.ssl.SSLHandshakeException: Remote host terminated the handshake,open,2023-03-17 10:09:41,2023-08-08 03:36:46,,"18:07:19.701 [main] DEBUG org.apache.http.conn.ssl.SSLConnectionSocketFactory - Enabled protocols: [TLSv1.3, TLSv1.2]
+18:07:19.702 [main] DEBUG org.apache.http.conn.ssl.SSLConnectionSocketFactory - Enabled cipher suites:[TLS_AES_256_GCM_SHA384, TLS_AES_128_GCM_SHA256, TLS_CHACHA20_POLY1305_SHA256, TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384, TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256, TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256, TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384, TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256, TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, TLS_DHE_RSA_WITH_AES_256_GCM_SHA384, TLS_DHE_RSA_WITH_CHACHA20_POLY1305_SHA256, TLS_DHE_DSS_WITH_AES_256_GCM_SHA384, TLS_DHE_RSA_WITH_AES_128_GCM_SHA256, TLS_DHE_DSS_WITH_AES_128_GCM_SHA256, TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384, TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384, TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256, TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256, TLS_DHE_RSA_WITH_AES_256_CBC_SHA256, TLS_DHE_DSS_WITH_AES_256_CBC_SHA256, TLS_DHE_RSA_WITH_AES_128_CBC_SHA256, TLS_DHE_DSS_WITH_AES_128_CBC_SHA256, TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384, TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384, TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256, TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256, TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384, TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384, TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256, TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256, TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA, TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA, TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA, TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA, TLS_DHE_RSA_WITH_AES_256_CBC_SHA, TLS_DHE_DSS_WITH_AES_256_CBC_SHA, TLS_DHE_RSA_WITH_AES_128_CBC_SHA, TLS_DHE_DSS_WITH_AES_128_CBC_SHA, TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA, TLS_ECDH_RSA_WITH_AES_256_CBC_SHA, TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA, TLS_ECDH_RSA_WITH_AES_128_CBC_SHA, TLS_RSA_WITH_AES_256_GCM_SHA384, TLS_RSA_WITH_AES_128_GCM_SHA256, TLS_RSA_WITH_AES_256_CBC_SHA256, TLS_RSA_WITH_AES_128_CBC_SHA256, TLS_RSA_WITH_AES_256_CBC_SHA, TLS_RSA_WITH_AES_128_CBC_SHA, TLS_EMPTY_RENEGOTIATION_INFO_SCSV]
+18:07:19.702 [main] DEBUG org.apache.http.conn.ssl.SSLConnectionSocketFactory - Starting handshake
+18:07:19.768 [main] DEBUG org.apache.http.impl.conn.DefaultManagedHttpClientConnection - http-outgoing-0: Shutdown connection
+18:07:19.768 [main] DEBUG org.apache.http.impl.execchain.MainClientExec - Connection discarded
+18:07:19.769 [main] DEBUG org.apache.http.impl.conn.PoolingHttpClientConnectionManager - Connection released: [id: 0][route: {s}->https://api.telegram.org:443][total available: 0; route allocated: 0 of 2; total allocated: 0 of 100]
+Error removing old webhook
+	at org.telegram.telegrambots.util.WebhookUtils.clearWebhook(WebhookUtils.java:113)
+	at org.telegram.telegrambots.bots.TelegramLongPollingBot.clearWebhook(TelegramLongPollingBot.java:41)
+	at org.telegram.telegrambots.meta.TelegramBotsApi.registerBot(TelegramBotsApi.java:65)
+	at com.tg.Test.main(Test.java:23)
+Caused by: org.telegram.telegrambots.meta.exceptions.TelegramApiException: Unable to execute deleteWebhook method
+	at org.telegram.telegrambots.bots.DefaultAbsSender.sendApiMethod(DefaultAbsSender.java:1098)
+	at org.telegram.telegrambots.meta.bots.AbsSender.execute(AbsSender.java:64)
+	at org.telegram.telegrambots.util.WebhookUtils.clearWebhook(WebhookUtils.java:108)
+	... 3 more
+Caused by: javax.net.ssl.SSLHandshakeException: Remote host terminated the handshake
+	at java.base/sun.security.ssl.SSLSocketImpl.handleEOF(SSLSocketImpl.java:1714)
+	at java.base/sun.security.ssl.SSLSocketImpl.decode(SSLSocketImpl.java:1513)
+	at java.base/sun.security.ssl.SSLSocketImpl.readHandshakeRecord(SSLSocketImpl.java:1420)
+	at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:455)
+	at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:426)
+	at org.apache.http.conn.ssl.SSLConnectionSocketFactory.createLayeredSocket(SSLConnectionSocketFactory.java:436)
+	at org.apache.http.conn.ssl.SSLConnectionSocketFactory.connectSocket(SSLConnectionSocketFactory.java:384)
+	at org.apache.http.impl.conn.DefaultHttpClientConnectionOperator.connect(DefaultHttpClientConnectionOperator.java:142)
+	at org.apache.http.impl.conn.PoolingHttpClientConnectionManager.connect(PoolingHttpClientConnectionManager.java:376)
+	at org.apache.http.impl.execchain.MainClientExec.establishRoute(MainClientExec.java:393)
+	at org.apache.http.impl.execchain.MainClientExec.execute(MainClientExec.java:236)
+	at org.apache.http.impl.execchain.ProtocolExec.execute(ProtocolExec.java:186)
+	at org.apache.http.impl.execchain.RetryExec.execute(RetryExec.java:89)
+	at org.apache.http.impl.execchain.RedirectExec.execute(RedirectExec.java:110)
+	at org.apache.http.impl.client.InternalHttpClient.doExecute(InternalHttpClient.java:185)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:83)
+	at org.telegram.telegrambots.bots.DefaultAbsSender.sendHttpPostRequest(DefaultAbsSender.java:1130)
+	at org.telegram.telegrambots.bots.DefaultAbsSender.sendMethodRequest(DefaultAbsSender.java:1126)
+	at org.telegram.telegrambots.bots.DefaultAbsSender.sendApiMethod(DefaultAbsSender.java:1095)
+	... 5 more
+Caused by: java.io.EOFException: SSL peer shut down incorrectly
+	at java.base/sun.security.ssl.SSLSocketInputRecord.read(SSLSocketInputRecord.java:483)
+	at java.base/sun.security.ssl.SSLSocketInputRecord.readHeader(SSLSocketInputRecord.java:472)
+	at java.base/sun.security.ssl.SSLSocketInputRecord.decode(SSLSocketInputRecord.java:160)
+	at java.base/sun.security.ssl.SSLTransport.decode(SSLTransport.java:111)
+	at java.base/sun.security.ssl.SSLSocketImpl.decode(SSLSocketImpl.java:1505)
+	... 22 more
+Disconnected from the target VM, address: '127.0.0.1:56351', transport: 'socket'
+
+Process finished with exit code 0",[],[],,3
+1202,TelegramLongPollingBot marked as deprecated but no hints on how to solve the problem,closed,2023-03-14 16:02:12,2023-03-15 06:27:52,2023-03-15 06:27:52,"Following the ""Getting started"" guide to create a base bot I extend the class TelegramLongPollingBot but while compiling I get this deprecation error:
+
+> warning: [deprecation] TelegramLongPollingBot() in TelegramLongPollingBot has been deprecated
+
+The problem is that both in the guide and in the API there is no hint on the way forward and what is the ""right"" solution to avoid the deprecation.",[],[],,2
+1200,Universal method for executing methods,closed,2023-03-09 05:52:59,2023-03-25 04:47:55,2023-03-25 04:47:55,"Hi there.
+
+There are situations when you don’t know if you just need to send a message or a photo, video or even a media group. In the **DefualtAbsSender** class, there is an `execute(BotApiMethod<T>)` method that can execute simple methods such as **SendMessage** . However, other methods like **SendPhoto** and **SendVideo** do not inherit the **BotApiMethod** class and have their own execution methods in **DefualtAbsSender** (which is completely understandable).
+
+Is it possible to execute absolutely any **PartialBotApiMethod** object using one method? I see only two solutions: using the `if instanceof ` construction and using **reflections** to find the right method in the **DefualtAbsSender** class.
+
+The first solution takes up a lot of space, looks terrible, and needs to be constantly replenished when a new method appears. The second option looks better, but may cause an extra delay in execution. It seems to me that there is, or should be, a simpler and more productive way.",[],[],,0
+1199,[400] Bad Request: wrong file identifier/HTTP URL specified,open,2023-03-07 18:00:25,2023-05-25 17:25:59,,"I get an error for some images, i send image to user by FileId
+`                    SendPhoto send = new SendPhoto();
+                    send.setChatId(chatId);
+                    send.setPhoto(new InputFile(pathImage));
+                    send.setReplyMarkup(markupInline);
+                    if(text != null) {
+                        send.setCaption(""Выложено "" + date + "" пользователем @"" + userName + ""\n----------\n"" + text);
+                    }
+                    Main.bot.sendPhoto(chatId, send);`
+                    
+                    how to fix it?????",[],[],,1
