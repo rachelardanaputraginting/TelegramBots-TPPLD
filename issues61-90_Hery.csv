@@ -1,0 +1,376 @@
+number,title,state,created_at,updated_at,closed_at,body,labels,assignees,milestone,comments
+1197,Can't use SendPhoto or SendSticker with WebHook,closed,2023-03-04 11:11:56,2023-03-04 15:21:33,2023-03-04 15:21:33,I use WebHooks for my bot. I can return SendMessage method because it extends BotApiMethod<>. But SendPhoto and SendSticker not extends BotApiMethod. Is this a bug?,[],[],,0
+1196,Spring configuration,open,2023-02-27 13:00:44,2023-06-15 07:51:45,,"Adding new spring boot config while keeping the old spring.factories. This should provide basic support for both Spring Boot 2 and 3. May still break if you use the wrong Jakarta versions.
+
+> I still would suggest having `[META-INF/spring.factories]` for the mean time with a [META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports] side by side. This should already do the job to support both, Spring Boot 2 & 3 at the same time.
+> 
+> _Originally posted by @patbaumgartner in https://github.com/rubenlagus/TelegramBots/issues/1155#issuecomment-1445306344_
+            ",[],[],,2
+1195,Replace dependency definitions with BOMs where possible,open,2023-02-27 12:57:31,2023-02-27 12:57:31,,Using BOMs ensures that the dependencies are compatible,[],[],,0
+1194,Update Getting-Started.md and How-To-Update.md,open,2023-02-26 10:40:36,2023-02-26 10:40:36,,,[],[],,0
+1193,update.getPollAnswer() returns null,open,2023-02-26 08:40:58,2023-02-26 08:40:58,,"**Description of the bug**
+getPollAnswer method returns null value, but request from telegramAPI shows the poll answer
+
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Send not anonymous poll with allowed multiple answers.
+2. vote for any option (one or many, doesn't matter)
+3. see the null value from update.getPollAnswer()
+
+**Screenshots**
+request for updates from telegram api
+![image](https://user-images.githubusercontent.com/105144213/221400247-5270b949-9885-4819-b344-f188e3d97592.png)
+
+result in java when doing same action
+![image](https://user-images.githubusercontent.com/105144213/221400380-93ad045b-9785-42d7-95ed-b7da6783b800.png)
+
+
+**Project dependencies where can be conflict**
+spring boot v2.7.1
+hibernate v5.4.21
+jackson databind v2.11.3
+telegrambots v6.5.0
+
+",[],[],,0
+1192,InlineKeyboardButton location request,open,2023-02-23 23:30:33,2023-02-23 23:30:33,,"Hi there. Can you tell me how can I trigger a geolocation request from an InlineKeyboardButton? Unfortunately, I could not find the answer to this question in the documentation.",[],[],,0
+1191,InlineKeyboardButton Location request,closed,2023-02-23 23:29:02,2023-02-23 23:29:51,2023-02-23 23:29:51,"Всем привет. Можете подсказать как я могу вызвать запрос на геолокацию из InlineKeyboardButton? К сожалению, не смог найти ответ на этот вопрос в документации.",[],[],,0
+1190,Exclude transitive vulnerable dependency from telegrambots module,open,2023-02-21 20:32:27,2023-05-30 13:44:53,,"`telegrambots` module's dependency [**org.apache.httpcomponents.httpclient 4.5.13**](https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient/4.5.13) provides transitive vulnerable dependency [**commons-codec.commons-codec 1.11**](https://mvnrepository.com/artifact/commons-codec/commons-codec/1.11).
+
+On this regard, IntelliJ highlights the following:
+
+- [Cxeb68d52e-5509](https://devhub.checkmarx.com/cve-details/Cxeb68d52e-5509/) 3.7 Exposure of Sensitive Information to an Unauthorized Actor
+
+I checked if newer versions of `org.apache.httpcomponents.httpclient` upgraded that dependency but the [latest](https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient/4.5.14) is still exporting `commons-codec.commons-codec 1.11`.
+
+Sorting this out will also fix the same issue for the modules `telegrambots-abilities`, `telegrambots-chat-session-bot`, `telegrambots-extensions`, and `telegrambots-spring-boot-starter`:
+
+![image](https://user-images.githubusercontent.com/1816483/220450811-e43b809b-8cf3-4502-ae6c-08e3aec08838.png)
+",[],[],,6
+1189,Application quits after the migration to Spring Boot 3,closed,2023-02-04 07:35:40,2023-02-05 22:49:09,2023-02-05 22:49:09,"**Describe the bug**
+I have a simple bot with the following build.gradle
+```
+plugins {
+	id 'org.springframework.boot' version '3.0.2'
+	id 'io.spring.dependency-management' version '1.1.0'
+	id 'java'
+	id ""io.freefair.lombok"" version ""6.6.1""
+}
+
+group = 'com.github.vcvitaly'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+//	implementation 'org.springframework.boot:spring-boot-starter-web'
+//	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	testImplementation ('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: ""com.vaadin.external.google"", module:""android-json""
+	}
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.0.1'
+
+	implementation 'org.telegram:telegrambots-spring-boot-starter:6.4.0'
+	implementation 'org.apache.commons:commons-lang3:3.12.0'
+
+	testImplementation ""com.github.tomakehurst:wiremock-jre8:2.35.0""
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+```
+As you can see I tried to use Spring Boot 3.0.2. The application logs are:
+```
+Connected to the target VM, address: '127.0.0.1:58940', transport: 'socket'
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.0.2)
+
+2023-02-04T09:33:21.853+02:00  INFO 77789 --- [           main] .g.v.l.LearnWordsUsingPhrasesApplication : Starting LearnWordsUsingPhrasesApplication using Java 17 with PID 77789 (/Users/vcvitaly/IdeaProjects/learn-words-using-phrases/build/classes/java/main started by vcvitaly in /Users/vcvitaly/IdeaProjects/learn-words-using-phrases)
+2023-02-04T09:33:21.857+02:00 DEBUG 77789 --- [           main] .g.v.l.LearnWordsUsingPhrasesApplication : Running with Spring Boot v3.0.2, Spring v6.0.4
+2023-02-04T09:33:21.858+02:00  INFO 77789 --- [           main] .g.v.l.LearnWordsUsingPhrasesApplication : The following 1 profile is active: ""local""
+2023-02-04T09:33:22.407+02:00  INFO 77789 --- [           main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=902da117-4d7f-35ba-abb1-5c67be510f49
+2023-02-04T09:33:22.972+02:00  INFO 77789 --- [           main] .g.v.l.LearnWordsUsingPhrasesApplication : Started LearnWordsUsingPhrasesApplication in 1.555 seconds (process running for 2.209)
+Disconnected from the target VM, address: '127.0.0.1:58940', transport: 'socket'
+
+Process finished with exit code 0
+```
+The process finishes immediately, it was working before on Spring Boot 2.7, I'm not yet sure what was preventing it from quitting before.
+
+**To Reproduce**
+Steps to reproduce the behavior:
+Create a simple bot by extending TelegramLongPollingBot, use Spring Boot 3.0.2
+
+**Expected behavior**
+The application should not quit immediately after the startup.
+",[],[],,1
+1188,getPermissions and setPermissions not working,closed,2023-01-31 11:26:49,2023-02-12 18:42:14,2023-02-12 18:42:14,"Hi guys,
+I've tried to get group permissions through getPermissions method of chat object but ti returned me a null value. 
+I promoted my bot to administrator but i got the same result.
+However, I've tried to set them thtrough setPermissions method (giving it a ChatPermissions object with the new rules) but nothing was changed.
+Maybe, I was wrong to use the methods.
+Can anyone help me with this issue?  
+
+-Ubuntu 22.04LTS
+-Brave ",[],[],,2
+1187,fix - change mimeTypeVariable name in Animation object,open,2023-01-21 21:21:28,2023-01-21 21:21:28,,"In other objects (Document, Audio, and others), the objects are called mimeType. It would be cool if everyone had the same name. For example, it makes it easier to use the mapstruct library",[],[],,0
+1186,Error when use Spring Native,open,2023-01-19 17:21:50,2023-01-30 03:29:23,,"**Describe the bug**
+When use Spring Boot Native with Telegram Bots Spring library, get error of jackson
+
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Create a Spring Boot 2.7.7 project with Spring Native
+2. Add telegrambots-spring-boot-starter library
+3. Create a simple bot
+4. Compile with bootBuildImage
+5. Execute the image
+
+**Expected behavior**
+Start spring boot project with telegram bot
+
+**Actual**
+
+You get these errors:
+
+```kotlin
+Caused by: com.fasterxml.jackson.databind.exc.InvalidDefinitionException: Cannot construct instance of `org.telegram.telegrambots.meta.api.objects.ApiResponse` (no Creators, like default constructor, exist): cannot deserialize from Object value (no delegate- or property-based Creator)
+ at [Source: (String)""{""ok"":true,""result"":true,""description"":""Webhook is already deleted""}""; line: 1, column: 2]
+        at com.fasterxml.jackson.databind.DeserializationContext.reportBadDefinition(DeserializationContext.java:1904) ~[com.zred.zgitlab.ZGitlabApplicationKt:2.13.4.2]
+        at com.fasterxml.jackson.databind.DatabindContext.reportBadDefinition(DatabindContext.java:400) ~[com.zred.zgitlab.ZGitlabApplicationKt:2.13.4.2]
+        at com.fasterxml.jackson.databind.DeserializationContext.handleMissingInstantiator(DeserializationContext.java:1349) ~[com.zred.zgitlab.ZGitlabApplicationKt:2.13.4.2]
+        at com.fasterxml.jackson.databind.deser.BeanDeserializerBase.deserializeFromObjectUsingNonDefault(BeanDeserializerBase.java:1415) ~[com.zred.zgitlab.ZGitlabApplicationKt:2.13.4.2]
+        at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserializeFromObject(BeanDeserializer.java:352) ~[com.zred.zgitlab.ZGitlabApplicationKt:2.13.4.2]
+        at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserialize(BeanDeserializer.java:185) ~[com.zred.zgitlab.ZGitlabApplicationKt:2.13.4.2]
+        at com.fasterxml.jackson.databind.deser.DefaultDeserializationContext.readRootValue(DefaultDeserializationContext.java:323) ~[com.zred.zgitlab.ZGitlabApplicationKt:2.13.4.2]
+        at com.fasterxml.jackson.databind.ObjectMapper._readMapAndClose(ObjectMapper.java:4674) ~[com.zred.zgitlab.ZGitlabApplicationKt:2.13.4.2]
+        at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3629) ~[com.zred.zgitlab.ZGitlabApplicationKt:2.13.4.2]
+        at org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod.deserializeResponseInternal(PartialBotApiMethod.java:49) ~[com.zred.zgitlab.ZGitlabApplicationKt:na]
+
+```
+
+It works fine in .jar mode, only fail in native mode.
+
+",[],[],,1
+1185,Send sticker by sticker id,closed,2023-01-18 17:16:49,2023-03-04 11:02:57,2023-03-04 11:02:57,"Add the ability to send stickers not only via inputFile, but also via Telegram sticker id",[],[],,1
+1184,Fixes,open,2023-01-16 18:04:05,2023-01-22 15:48:39,,,[],[],,0
+1183,Allow ActionType setters for action,open,2023-01-15 10:46:16,2023-01-15 10:46:16,,,[],[],,0
+1182,Bot Token and username not found when running docker container,closed,2023-01-13 16:22:11,2023-01-14 02:17:19,2023-01-14 02:17:18,"Any Idea why the container can't detect token and username? The bot and server works fine when running outside the container. Not sure if I'm building the image wrong or running it wrongly. Many thanks.
+
+**Error:**
+```
+org.telegram.telegrambots.meta.exceptions.TelegramApiException: Bot token and username can't be empty
+        at org.telegram.telegrambots.meta.TelegramBotsApi.registerBot(TelegramBotsApi.java:62)
+        at com.nc1z.demobot1.Demobot1Application.main(Demobot1Application.java:18)
+        at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:577)
+        at org.springframework.boot.loader.MainMethodRunner.run(MainMethodRunner.java:49)
+        at org.springframework.boot.loader.Launcher.launch(Launcher.java:95)
+        at org.springframework.boot.loader.Launcher.launch(Launcher.java:58)
+        at org.springframework.boot.loader.JarLauncher.main(JarLauncher.java:65)
+```
+
+**Dockerfile:**
+```
+FROM openjdk:19-jdk-alpine
+ARG JAR_FILE=target/*.jar
+COPY ./target/demobot1-0.0.1-SNAPSHOT.jar app.jar
+EXPOSE 8080
+ENTRYPOINT [""java"",""-jar"",""/app.jar""]
+```
+
+**Demobot.java**
+```
+package com.nc1z.demobot1.bot;
+
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+public class DemoBot extends TelegramLongPollingBot {
+
+    @Override
+    public String getBotUsername() {
+        return ""MY_BOT_USERNAME"";
+    }
+
+    @Override
+    public String getBotToken() {
+        return ""MY_HARDCODED_BOT_TOKEN"";
+    }
+
+    @Override
+    public void onUpdateReceived(Update update) {
+    .... rest of the code
+  ```
+",[],[],,1
+1181,LongPoll Bot sometime miss message,open,2023-01-13 08:39:23,2023-01-13 08:39:23,,"**Describe the bug**
+Spring boot TelegramLongPollingBot sometime miss message. onUpdateReceived method check database and send message to user. 
+How config bot to overcome problem? Can increasing maxThread help?",[],[],,0
+1180,add new break line into TelegramLongPollingBot class,open,2023-01-12 17:22:13,2023-08-23 08:49:17,,,[],[],,0
+1179,How to listen for not bot messages — account messages.,open,2023-01-08 01:57:12,2023-08-21 03:31:52,,"Hi! I made my first Telegram bot. It's able to listen for new messages in the Telegram bot (BotFarther), code below, but I need to listen for  new messages on my Telegram account! Not bot! How to do it help me please!
+
+```
+package org.example;
+
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
+
+public class Main {
+    public static void main(String[] args) {
+        try {
+            TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
+            MyBot bot = new MyBot();
+            telegramBotsApi.registerBot(bot);
+
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+class MyBot extends TelegramLongPollingBot {
+    @Override
+    public void onUpdateReceived(Update update) {
+        System.out.println(""Hello World"");
+    }
+
+    @Override
+    public String getBotUsername() {
+        return ""BOT_USERNAME"";
+    }
+
+    @Override
+    public String getBotToken() {
+        return ""BOT_TOKEN"";
+    }
+
+}
+```
+
+",[],[],,2
+1178,Merge Telegram Client,closed,2023-01-07 14:49:20,2023-08-20 12:43:24,2023-08-20 12:43:24,,[],[],,0
+1177,Telegram bots 7.X.X,open,2023-01-06 14:23:12,2023-08-23 08:49:17,,New redesign of Telegram Bots,[],[],,0
+1176,ERROR DefaultBotSession - Unable to deserialize response,closed,2023-01-04 14:52:53,2023-01-04 22:05:21,2023-01-04 22:05:21,"On start up bot I receive this errors
+`17:46:53 [INFO] NEXUSBOT: TG BOT ENABLED2!!!
+17:46:53 [INFO] NEXUSBOT: TG BOT ENABLED2!!!
+17:46:53 [INFO] NEXUSBOT: TG BOT ENABLED2!!!
+17:46:53 [INFO] 17:46:53.665 [NGriefBot Telegram Connection] ERROR org.telegram.telegrambots.updatesreceivers.DefaultBotSession - Unable to deserialize response
+org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException: Unable to deserialize response
+	at org.telegram.telegrambots.meta.api.methods.updates.GetUpdates.deserializeResponse(GetUpdates.java:96) ~[NexusBot.jar:?]
+	at org.telegram.telegrambots.updatesreceivers.DefaultBotSession$ReaderThread.getUpdatesFromServer(DefaultBotSession.java:260) ~[NexusBot.jar:?]
+	at org.telegram.telegrambots.updatesreceivers.DefaultBotSession$ReaderThread.run(DefaultBotSession.java:189) [NexusBot.jar:?]
+Caused by: com.fasterxml.jackson.databind.JsonMappingException: Numeric value (2571505618) out of range of int
+ at [Source: (StringReader); line: 2, column: 1039]
+ at [Source: (StringReader); line: 2, column: 1029] (through reference chain: org.telegram.telegrambots.meta.api.objects.ApiResponse[""result""]->java.util.ArrayList[0]->org.telegram.telegrambots.meta.api.objects.Update[""message""]->org.telegram.telegrambots.meta.api.objects.Message[""video""]->org.telegram.telegrambots.meta.api.objects.Video[""file_size""])
+	at com.fasterxml.jackson.databind.JsonMappingException.wrapWithPath(JsonMappingException.java:391) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.JsonMappingException.wrapWithPath(JsonMappingException.java:351) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializerBase.wrapAndThrow(BeanDeserializerBase.java:1704) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.vanillaDeserialize(BeanDeserializer.java:290) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserialize(BeanDeserializer.java:151) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.impl.MethodProperty.deserializeAndSet(MethodProperty.java:127) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.vanillaDeserialize(BeanDeserializer.java:288) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserialize(BeanDeserializer.java:151) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.impl.MethodProperty.deserializeAndSet(MethodProperty.java:127) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.vanillaDeserialize(BeanDeserializer.java:288) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserialize(BeanDeserializer.java:151) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.std.CollectionDeserializer.deserialize(CollectionDeserializer.java:286) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.std.CollectionDeserializer.deserialize(CollectionDeserializer.java:245) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.std.CollectionDeserializer.deserialize(CollectionDeserializer.java:27) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.impl.FieldProperty.deserializeAndSet(FieldProperty.java:136) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.vanillaDeserialize(BeanDeserializer.java:288) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserialize(BeanDeserializer.java:151) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.ObjectMapper._readMapAndClose(ObjectMapper.java:4001) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3011) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at org.telegram.telegrambots.meta.api.methods.updates.GetUpdates.deserializeResponse(GetUpdates.java:88) ~[NexusBot.jar:?]
+	... 2 more
+Caused by: com.fasterxml.jackson.core.JsonParseException: Numeric value (2571505618) out of range of int
+ at [Source: (StringReader); line: 2, column: 1039]
+	at com.fasterxml.jackson.core.JsonParser._constructError(JsonParser.java:1804) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.core.base.ParserMinimalBase._reportError(ParserMinimalBase.java:663) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.core.base.ParserBase.convertNumberToInt(ParserBase.java:869) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.core.base.ParserBase._parseIntValue(ParserBase.java:801) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.core.base.ParserBase.getIntValue(ParserBase.java:645) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.std.NumberDeserializers$IntegerDeserializer.deserialize(NumberDeserializers.java:472) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.std.NumberDeserializers$IntegerDeserializer.deserialize(NumberDeserializers.java:452) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.impl.MethodProperty.deserializeAndSet(MethodProperty.java:127) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.vanillaDeserialize(BeanDeserializer.java:288) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserialize(BeanDeserializer.java:151) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.impl.MethodProperty.deserializeAndSet(MethodProperty.java:127) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.vanillaDeserialize(BeanDeserializer.java:288) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserialize(BeanDeserializer.java:151) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.impl.MethodProperty.deserializeAndSet(MethodProperty.java:127) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.vanillaDeserialize(BeanDeserializer.java:288) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserialize(BeanDeserializer.java:151) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.std.CollectionDeserializer.deserialize(CollectionDeserializer.java:286) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.std.CollectionDeserializer.deserialize(CollectionDeserializer.java:245) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.std.CollectionDeserializer.deserialize(CollectionDeserializer.java:27) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.impl.FieldProperty.deserializeAndSet(FieldProperty.java:136) ~
+17:46:53 [INFO] [BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.vanillaDeserialize(BeanDeserializer.java:288) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserialize(BeanDeserializer.java:151) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.ObjectMapper._readMapAndClose(ObjectMapper.java:4001) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3011) ~[BungeeCord.jar:git:BungeeCord-Bootstrap:1.13-SNAPSHOT:5a3938a:unknown]
+	at org.telegram.telegrambots.meta.api.methods.updates.GetUpdates.deserializeResponse(GetUpdates.java:88) ~[NexusBot.jar:?]
+	... 2 more
+`
+Here is my code Start:
+`try {
+                TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
+               // tgBotListener = new BotListener();
+                botsApi.registerBot(new BotTest());
+                System.out.println(""NEXUSBOT: TG BOT ENABLED2!!!"");
+                System.out.println(""NEXUSBOT: TG BOT ENABLED2!!!"");
+                System.out.println(""NEXUSBOT: TG BOT ENABLED2!!!"");
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }`
+
+Here is BotTest class:
+`import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import ru.vanya.nexusbot.NexusBotPlugin;
+
+public class BotTest extends TelegramLongPollingBot {
+
+
+    @Override
+    public String getBotUsername() {
+        return NexusBotPlugin.getTGUsername();
+    }
+
+    @Override
+    public String getBotToken() {
+        return NexusBotPlugin.getTGToken();
+    }
+
+    @Override
+    public void onUpdateReceived(Update update) {
+
+    }
+}
+`
+What is the problem? This was not the case before. If you remove the registration of the bot, then there is no error at startup.
+TelegramBots version is 6.4.0
+",[],[],,2
+1175,"BAG Method ""getMethod"" of class SendSticker return null not PATH vari…",closed,2023-01-04 10:28:25,2023-01-04 11:24:18,2023-01-04 11:24:18,Update SendSticker class ,[],[],,1
+1174,Dev,closed,2023-01-04 02:37:50,2023-02-06 00:11:44,2023-02-06 00:11:44,,[],[],,0
+1173,Remove guava dep from main modules,closed,2023-01-04 01:30:20,2023-01-04 01:35:03,2023-01-04 01:35:03,,[],[],,0
+1172,Dev,closed,2023-01-02 18:03:36,2023-01-02 18:05:14,2023-01-02 18:05:14,,[],[],,0
+1171,Dev,closed,2023-01-02 08:37:21,2023-01-03 19:46:04,2023-01-03 19:46:04,"Fixed tpyo on README.md
+Under header Example bots
+Chnaged the fourth option from (Send files uploding them) to (Send files uploading them)",[],[],,0
+1170,Fix typo,closed,2023-01-02 07:55:30,2023-01-02 07:56:16,2023-01-02 07:56:05,,[],[],,0
+1169,Skip updates when bot is off,open,2023-01-02 01:31:08,2023-01-02 15:31:57,,"As soon as i turn my bot on, it answers to updates received when it was off. Is there a way to skip these updates?",[],[],,2
