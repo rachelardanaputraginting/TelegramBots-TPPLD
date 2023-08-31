@@ -1,0 +1,429 @@
+number,title,state,created_at,updated_at,closed_at,body,labels,assignees,milestone,comments
+1167,Pass token in constructor,closed,2022-12-31 10:21:28,2023-04-19 07:06:13,2023-01-04 11:27:29,Currently in the backwards compatible version. The constructors without botToken should be removed in the future,[],[],,1
+1165, How to create Ability with ReplyFlow as action?,open,2022-12-26 03:35:07,2022-12-26 03:35:07,,"Hello! Could you please update wiki for AbilityBot with example how to create Ability with ReplyFlow as action? I've tried several options - no luck. Thanks a lot!
+",[],[],,0
+1164,The conflict in wiki for getting started,open,2022-12-14 15:21:30,2022-12-14 15:23:01,,"The wiki page for the ""Getting Started"" page looks distorted with a conflict(See the screenshot below):
+===========================================================================================
+![image](https://user-images.githubusercontent.com/91181094/207635166-2257b0ea-058f-406d-af1c-c9e5e39d80c7.png)
+===========================================================================================
+But the wiki in the source code looks normal(Screenshot for reference):
+===========================================================================================
+![image](https://user-images.githubusercontent.com/91181094/207635764-3d1c3dab-07bc-4ba1-9e7a-231466796d3e.png)
+===========================================================================================
+Looks like a change in the project wiki settings is needed",[],[],,0
+1163,"[BUG] #editMediaMessage does not work properly with ""file_id"" specified",open,2022-12-14 00:59:28,2022-12-26 06:51:15,,"**Describe the bug**
+Every time when I try to send an editMessageMedia I get ""Error editing message text: [400] Bad Request: MEDIA_EMPTY)""
+
+**To Reproduce**
+Steps to reproduce the behavior:
+
+This error occures when I try to change photo in a photoMessage already sent by a bot previously:
+
+```            
+InputMediaPhoto inputMediaPhoto = new InputMediaPhoto();
+inputMediaPhoto.setMedia(""AgACAgIAAxkBAAIlaWOZGQvBn2uHvqfTwVYHGD-ezlU5AAJgxzEbSojJSMNUFLrahKyaAQADAgADeAADLAQ"");
+
+EditMessageMedia editMessageMedia = new EditMessageMedia();
+editMessageMedia.setMedia(inputMediaPhoto);
+editMessageMedia.setReplyMarkup(null);
+editMessageMedia.setMessageId(messageId);
+editMessageMedia.setChatId(chatId);
+
+try {
+    telegramLongPollingBot.execute(editMessageMedia);
+} catch (TelegramApiException e) {
+    log.warn(""Error while editing media of a message! (bot-username: "" +
+        telegramLongPollingBot.getBotUsername() + "", reason: "" + e.getMessage() + "")"") ;
+}
+```
+
+**Expected behavior**
+Changes message's media (in my case - photo) to the one specified in _inputMediaPhoto_. 
+Note: _file_id_ is 100% correct.
+
+",[],[],,2
+1162,Thread-safety of TelegramLongPollingBot,closed,2022-12-05 09:37:54,2022-12-05 11:23:44,2022-12-05 11:23:44,"I have searched the open and closed issues and the wiki but couldn't find any information on thread-safety.
+My question/concern is whether an instance of `TelegramLongPollingBot` can be used by several threads concurrently?
+What about other ""bot types""? E.g., the one for webhooks.",[],[],,2
+1161,Can't Override onUpdateReceived and getBotUsername,closed,2022-12-01 13:29:54,2022-12-12 12:47:41,2022-12-12 12:47:06,"**Describe the bug**
+When i try to Override `onUpdateReceived` and `getBotUsername` methods the `The method onUpdateReceived(Update) of type TelegramBot must override a superclass method` appears. With `getBotToken` method Override works fine. Also, there's a red mark on the pom.xml file.
+UPD: I have fixed error with pom.xml file, but the main issue is still there :(
+
+**To Reproduce**
+I don't know how to reproduce this error. 
+All i did was creating new maven project in eclipse and adding dependency.
+
+
+**Screenshots**
+![изображение](https://user-images.githubusercontent.com/94926682/205064741-eb87828f-3ba1-4617-843f-a219bbd29b6f.png)
+![изображение](https://user-images.githubusercontent.com/94926682/205064853-9a6e9687-bd6f-4017-bd47-142f59473c9b.png)
+
+
+**Desktop (please complete the following information):**
+ - OS: Windows 10
+ - Browser Firefox
+ - Version 107.0.1
+
+
+
+
+",[],[],,1
+1160,[Bug] Message not getting displayed,closed,2022-11-30 01:07:41,2022-12-31 00:58:13,2022-12-31 00:58:13,"**Describe the bug**
+When I try to fetch a user's message via `public void onUpdateReceived(Update update) {` I only get isolated messages, i.e. every 5 or 10 first.
+
+**To Reproduce**
+Use the following code:
+```
+@Override
+    public void onUpdateReceived(Update update) {
+        System.out.println(""message rwecieved"");
+    }
+```
+
+We using debian server with java on it
+",[],[],,3
+1159,Fixing wrong JsonProperty name for StickerSet,closed,2022-11-29 18:33:02,2022-12-31 00:49:44,2022-12-31 00:49:44,"Got the error:
+
+`org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException: Unable to deserialize response
+	at org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod.deserializeResponseInternal(PartialBotApiMethod.java:56)
+	at org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod.deserializeResponse(PartialBotApiMethod.java:33)
+	at org.telegram.telegrambots.meta.api.methods.stickers.GetStickerSet.deserializeResponse(GetStickerSet.java:45)
+	at org.telegram.telegrambots.meta.api.methods.stickers.GetStickerSet.deserializeResponse(GetStickerSet.java:22)
+	at org.telegram.telegrambots.bots.DefaultAbsSender.sendApiMethod(DefaultAbsSender.java:1072)
+	at org.telegram.telegrambots.meta.bots.AbsSender.execute(AbsSender.java:64)
+	at dev.storozhenko.familybot.common.extensions.SenderExtensionsKt$sendStickerInternal$stickerId$1$1.invokeSuspend(SenderExtensions.kt:200)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:106)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:570)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:750)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:677)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:664)
+Caused by: com.fasterxml.jackson.databind.exc.InvalidDefinitionException: Conflicting getter definitions for property ""stickers"": org.telegram.telegrambots.meta.api.objects.stickers.StickerSet#getStickerType() vs org.telegram.telegrambots.meta.api.objects.stickers.StickerSet#getStickers()
+ at [Source: (String)""{""ok"":true,""result"":{""name"":""youaretoday"",""title"":""\u041a\u0430\u043a\u043e\u0439 \u0442\u044b \u0441\u0435\u0433\u043e\u0434\u043d\u044f?"",""is_animated"":false,""is_video"":false,""sticker_type"":""regular"",""contains_masks"":false,""stickers"":[{""width"":512,""height"":478,""emoji"":""\ud83d\ude0d"",""set_name"":""youaretoday"",""is_animated"":false,""is_video"":false,""type"":""regular"",""thumb"":{""file_id"":""AAMCAgADFQABY4ZN2ONe9fu25D1UiK0tkjYQ7QIAAgcAA2kzKBNxEASAsWjDmwEAB20AAysE"",""file_unique_id"":""AQADBwADaTMoE3I"",""file_""[truncated 7539 chars]; line: 1, column: 1]
+	at com.fasterxml.jackson.databind.exc.InvalidDefinitionException.from(InvalidDefinitionException.java:62)
+	at com.fasterxml.jackson.databind.deser.BeanDeserializerFactory.buildBeanDeserializer(BeanDeserializerFactory.java:269)
+	at com.fasterxml.jackson.databind.deser.BeanDeserializerFactory.createBeanDeserializer(BeanDeserializerFactory.java:151)
+	at com.fasterxml.jackson.databind.deser.DeserializerCache._createDeserializer2(DeserializerCache.java:415)
+	at com.fasterxml.jackson.databind.deser.DeserializerCache._createDeserializer(DeserializerCache.java:350)
+	at com.fasterxml.jackson.databind.deser.DeserializerCache._createAndCache2(DeserializerCache.java:264)
+	at com.fasterxml.jackson.databind.deser.DeserializerCache._createAndCacheValueDeserializer(DeserializerCache.java:244)
+	at com.fasterxml.jackson.databind.deser.DeserializerCache.findValueDeserializer(DeserializerCache.java:142)
+	at com.fasterxml.jackson.databind.DeserializationContext.findNonContextualValueDeserializer(DeserializationContext.java:638)
+	at com.fasterxml.jackson.databind.deser.BeanDeserializerBase.resolve(BeanDeserializerBase.java:539)
+	at com.fasterxml.jackson.databind.deser.DeserializerCache._createAndCache2(DeserializerCache.java:294)
+	at com.fasterxml.jackson.databind.deser.DeserializerCache._createAndCacheValueDeserializer(DeserializerCache.java:244)
+	at com.fasterxml.jackson.databind.deser.DeserializerCache.findValueDeserializer(DeserializerCache.java:142)
+	at com.fasterxml.jackson.databind.DeserializationContext.findRootValueDeserializer(DeserializationContext.java:648)
+	at com.fasterxml.jackson.databind.ObjectMapper._findRootDeserializer(ObjectMapper.java:4861)
+	at com.fasterxml.jackson.databind.ObjectMapper._readMapAndClose(ObjectMapper.java:4731)
+	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3677)
+	at org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod.deserializeResponseInternal(PartialBotApiMethod.java:49)
+	... 12 common frames omitted
+Caused by: java.lang.IllegalArgumentException: Conflicting getter definitions for property ""stickers"": org.telegram.telegrambots.meta.api.objects.stickers.StickerSet#getStickerType() vs org.telegram.telegrambots.meta.api.objects.stickers.StickerSet#getStickers()
+	at com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder.getGetter(POJOPropertyBuilder.java:449)
+	at com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition.getAccessor(BeanPropertyDefinition.java:188)
+	at com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder._getSetterInfo(POJOPropertyBuilder.java:265)
+	at com.fasterxml.jackson.databind.introspect.POJOPropertyBuilder.getMetadata(POJOPropertyBuilder.java:242)
+	at com.fasterxml.jackson.databind.introspect.POJOPropertiesCollector._anyIndexed(POJOPropertiesCollector.java:1240)
+	at com.fasterxml.jackson.databind.introspect.POJOPropertiesCollector._sortProperties(POJOPropertiesCollector.java:1142)
+	at com.fasterxml.jackson.databind.introspect.POJOPropertiesCollector.collectAll(POJOPropertiesCollector.java:470)
+	at com.fasterxml.jackson.databind.introspect.POJOPropertiesCollector.getPropertyMap(POJOPropertiesCollector.java:386)
+	at com.fasterxml.jackson.databind.introspect.POJOPropertiesCollector.getProperties(POJOPropertiesCollector.java:233)
+	at com.fasterxml.jackson.databind.introspect.BasicBeanDescription._properties(BasicBeanDescription.java:164)
+	at com.fasterxml.jackson.databind.introspect.BasicBeanDescription.findProperties(BasicBeanDescription.java:239)
+	at com.fasterxml.jackson.databind.deser.BasicDeserializerFactory._findCreatorsFromProperties(BasicDeserializerFactory.java:328)
+	at com.fasterxml.jackson.databind.deser.BasicDeserializerFactory._constructDefaultValueInstantiator(BasicDeserializerFactory.java:272)
+	at com.fasterxml.jackson.databind.deser.BasicDeserializerFactory.findValueInstantiator(BasicDeserializerFactory.java:223)
+	at com.fasterxml.jackson.databind.deser.BeanDeserializerFactory.buildBeanDeserializer(BeanDeserializerFactory.java:262)
+	... 28 common frames omitted`
+
+After the inspection I have found a bug, so here is a fix",[],[],,0
+1158,[Improvement] externalising telegram client,open,2022-11-29 12:27:22,2022-12-29 23:49:27,,"This Issue is used to track the ongoing process of making a separate telegram client module, not a feature request
+
+## Goal
+The goal is to have a specific module that encapsulates all the communication with the telegram api
+
+## Out of Scope
+The module will not contain any logic for implementing bots. It will not implement any long polling or other logics. Only validation and parsing of the api object from the meta package
+
+## Design decisions
+- The module will be implement async first. All methods and core functionality will be implemented using the Future-API of java
+- The module will contain blocking wrapper components that allow calling the API in a blocking way
+- The module will use OkHttp3 as the underlying http client
+
+## Requirements
+
+- [x] request all basic methods using http get requests
+- [x] allow file upload using multipart requests
+- [x] configuration of base-url, timeouts and connections-pool size using a http-client independent interface
+- [x] Offer a generic interface that allows for custom implementations of clients to use with other telegram modules
+- [ ] Configuration of proxys using a http-client independent interface
+
+## Future Plans
+- Implement a http facade to simplify implementing custom http-clients
+- Offer facade implementations for the most common http clients",['enhancement'],[],,0
+1157,123,closed,2022-11-29 09:51:24,2022-12-31 00:50:07,2022-12-31 00:50:07,,[],[],,0
+1156,How to delete message about user coming into group,open,2022-11-28 22:18:50,2023-03-29 07:23:35,,"Hey, I am looking for a way that my Telegram Bot can delete the message about users coming into the group.
+
+![image](https://user-images.githubusercontent.com/98133651/204392714-a809e928-de01-4971-98af-c9fb22f7f836.png)
+",[],[],,2
+1155,Spring Boot 3 support,closed,2022-11-28 20:50:19,2023-02-27 12:27:14,2023-02-27 12:27:13,"This PR addresses issue #1144 
+
+- Support Spring Boot 3 and Jakarta EE 9
+- Switch the release version of Java to 11 for better support of JDK 17
+- Switch the release version of telegrambots-spring-boot-starter to Java 17",[],[],,3
+1154,Can not resolve method execute and null option error ,open,2022-11-27 22:38:31,2023-06-24 03:11:15,,"My IDE (IntelliJ IDEA Community Edition 2021.3) says that there isn't any reference to execute method when I want to send a message (type SendMessage obj)
+ 
+![image](https://user-images.githubusercontent.com/98133651/204163459-1bacdadf-a463-49b4-9c70-a4c7b4870248.png)
+![image](https://user-images.githubusercontent.com/98133651/204163491-23c55124-3c27-481b-befa-a098e18657ce.png)
+
+After trying the sender.execute(obj) it is showed 
+ 
+![image](https://user-images.githubusercontent.com/98133651/204163507-e8fe6b30-51aa-4376-a773-33471a1f2493.png)
+
+What should I do in this case?
+",[],[],,1
+1153,Add the ability to add a spoiler to the bot message.,open,2022-11-25 09:10:01,2022-11-25 09:10:01,,Add the ability to add a spoiler to the bot message.,[],[],,0
+1152,Spring boot 3.0 and jakarta.xml,open,2022-11-25 07:47:11,2023-04-26 05:33:39,,"Hi.
+
+I upgrade to spring boot 3.0 and runtime failed to find  `javax.xml.*` classes, it needed by `JaxbAnnotationModule`, that provided in `com.fasterxml.jackson.module:jackson-module-jaxb-annotations`. It is dependency of  `org.telegram:telegrambots-meta:6.3.0` and `com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider`.
+
+![image](https://user-images.githubusercontent.com/1404372/203927824-2894cc98-bc55-40a2-9417-b835e56b57e4.png)
+
+Downgrading of `jakarta.xml.bind:jakarta.xml.bind-api` back to 2.3.3 breaks another jackson module",[],[],,6
+1151,"""How can I compile my project?"" doesn't work. Recording is archived",open,2022-11-23 18:32:06,2022-11-23 18:32:06,,"Recording of project compiling is archived
+
+<img width=""930"" alt=""image"" src=""https://user-images.githubusercontent.com/89937624/203622069-aab54f8c-76e1-4aa2-9ead-39aa136343ba.png"">
+
+",[],[],,0
+1150,SerialVersionUID error spotted on updating the version,open,2022-11-23 08:07:59,2022-11-23 08:07:59,,"**Spotted this error while updating from 6.0.1 to 6.1.0**
+By Bot has 1 predefined command set from BotFather ""menu"". While sending this command to my bot spotted this error. 
+Other commands built with InlineKeyboardButton work well.
+
+2022-11-23 10:49:13.678 ERROR 98140 --- [legram Executor] o.t.t.u.DefaultBotSession                : null
+org.mapdb.DBException$SerializationError: null
+	at org.mapdb.StoreDirectAbstract.deserialize(StoreDirectAbstract.kt:234) ~[mapdb-3.0.8.jar:na]
+	at org.mapdb.StoreWAL.get(StoreWAL.kt:527) ~[mapdb-3.0.8.jar:na]
+	at org.mapdb.HTreeMap.valueUnwrap(HTreeMap.kt:1198) ~[mapdb-3.0.8.jar:na]
+	at org.mapdb.HTreeMap.getprotected(HTreeMap.kt:644) ~[mapdb-3.0.8.jar:na]
+	at org.mapdb.HTreeMap.get(HTreeMap.kt:603) ~[mapdb-3.0.8.jar:na]
+	at java.base/java.util.concurrent.ConcurrentMap.compute(ConcurrentMap.java:418) ~[na:na]
+	at org.telegram.abilitybots.api.bot.BaseAbilityBot.addUser(BaseAbilityBot.java:650) ~[telegrambots-abilities-6.1.0.jar:na]
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179) ~[na:na]
+	at java.base/java.util.stream.Streams$StreamBuilderImpl.forEachRemaining(Streams.java:411) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499) ~[na:na]
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150) ~[na:na]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596) ~[na:na]
+	at org.telegram.abilitybots.api.bot.BaseAbilityBot.onUpdateReceived(BaseAbilityBot.java:258) ~[telegrambots-abilities-6.1.0.jar:na]
+	at org.telegram.abilitybots.api.bot.AbilityBot.onUpdateReceived(AbilityBot.java:55) ~[telegrambots-abilities-6.1.0.jar:na]
+	at com.multiforecast.telegrambot.bot.WeatherBot.onUpdateReceived(WeatherBot.java:80) ~[classes/:na]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511) ~[na:na]
+	at org.telegram.telegrambots.meta.generics.LongPollingBot.onUpdatesReceived(LongPollingBot.java:27) ~[telegrambots-meta-6.1.0.jar:na]
+	at org.telegram.telegrambots.updatesreceivers.DefaultBotSession$HandlerThread.run(DefaultBotSession.java:317) ~[telegrambots-6.1.0.jar:na]
+Caused by: java.io.InvalidClassException: org.telegram.telegrambots.meta.api.objects.User; local class incompatible: stream classdesc serialVersionUID = 6678428979975123692, local class serialVersionUID = 6862340916727369648
+	at java.base/java.io.ObjectStreamClass.initNonProxy(ObjectStreamClass.java:597) ~[na:na]
+	at java.base/java.io.ObjectInputStream.readNonProxyDesc(ObjectInputStream.java:2076) ~[na:na]
+	at java.base/java.io.ObjectInputStream.readClassDesc(ObjectInputStream.java:1925) ~[na:na]
+	at java.base/java.io.ObjectInputStream.readOrdinaryObject(ObjectInputStream.java:2248) ~[na:na]
+	at java.base/java.io.ObjectInputStream.readObject0(ObjectInputStream.java:1760) ~[na:na]
+	at java.base/java.io.ObjectInputStream.readObject(ObjectInputStream.java:538) ~[na:na]
+	at java.base/java.io.ObjectInputStream.readObject(ObjectInputStream.java:496) ~[na:na]
+	at org.mapdb.serializer.SerializerJava.deserialize(SerializerJava.java:71) ~[mapdb-3.0.8.jar:na]
+	at org.mapdb.StoreDirectAbstract.deserialize(StoreDirectAbstract.kt:229) ~[mapdb-3.0.8.jar:na]
+	... 22 common frames omitted
+
+**My class is** `public class WeatherBot extends AbilityBot `
+**My overrided onUpdate method. Described error happening in bold lines**
+@Override
+    public void onUpdateReceived(final Update update) {
+        if (update.hasMessage() && update.getMessage().getLocation() != null) {
+            botService.saveLocation(update);
+            return;
+        }
+        **if (!update.hasCallbackQuery()) {
+            super.onUpdateReceived(update);
+            return;
+        }**
+        if (isForecastRequested(update)) {
+            getForecast(update);
+        }
+        if (isLocationSetRequested(update)) {
+            getLocationButton(update);
+        }
+    }
+
+**System**
+ - OS: Ubuntu 22.04
+ - Java 17, Spring boot 2.7.5, telegrambots-abilities-6.1.0
+",[],[],,0
+1149,Remove old hook error,closed,2022-11-19 03:31:29,2022-11-20 03:26:53,2022-11-20 03:26:53,"**Describe the bug**
+A clear and concise description of what the bug is.
+<img width=""925"" alt=""image"" src=""https://user-images.githubusercontent.com/14249262/202831355-20f071fc-d4c1-4baf-bac7-ec0d3c00360a.png"">
+
+
+hi, I just transfer my telegram bot from a vps tp another vps. but in my new vps., I can run my bot application normally.
+I have check and search the issues list. and find the same issue with me.
+
+From that answer, you say my vps cant visit the api.telegram.org. But on my server, I can ping that server.
+
+<img width=""575"" alt=""image"" src=""https://user-images.githubusercontent.com/14249262/202832357-1e8b87aa-fe0b-465e-a8ea-a1ef65b39cf4.png"">
+
+i dont know how to solve this problem.
+",[],[],,1
+1148,Connect to api.telegram.org:443 [api.telegram.org/173.244.209.150] failed: Connection timed out: connect,open,2022-11-18 10:36:44,2023-04-26 19:52:12,,"**Describe the bug**
+Connect to api.telegram.org:443 [api.telegram.org/173.244.209.150] failed: Connection timed out: connect
+
+
+
+ache.http.client.protocol.RequestAddCookies - CookieSpec selected: default
+18:27:39.143 [main] DEBUG org.apache.http.client.protocol.RequestAuthCache - Auth cache not set in the context
+18:27:39.145 [main] DEBUG org.apache.http.impl.conn.PoolingHttpClientConnectionManager - Connection request: [route: {s}->https://api.telegram.org:443][total available: 0; route allocated: 0 of 2; total allocated: 0 of 100]
+18:27:39.159 [main] DEBUG org.apache.http.impl.conn.PoolingHttpClientConnectionManager - Connection leased: [id: 0][route: {s}->https://api.telegram.org:443][total available: 0; route allocated: 1 of 2; total allocated: 1 of 100]
+18:27:39.161 [main] DEBUG org.apache.http.impl.execchain.MainClientExec - Opening connection {s}->https://api.telegram.org:443
+18:27:40.218 [main] DEBUG org.apache.http.impl.conn.DefaultHttpClientConnectionOperator - Connecting to api.telegram.org/173.244.209.150:443
+18:27:40.218 [main] DEBUG org.apache.http.conn.ssl.SSLConnectionSocketFactory - Connecting socket to api.telegram.org/173.244.209.150:443 with timeout 75000
+18:28:01.251 [main] DEBUG org.apache.http.impl.conn.DefaultManagedHttpClientConnection - http-outgoing-0: Shutdown connection
+18:28:01.251 [main] DEBUG org.apache.http.impl.execchain.MainClientExec - Connection discarded
+18:28:01.252 [main] DEBUG org.apache.http.impl.conn.PoolingHttpClientConnectionManager - Connection released: [id: 0][route: {s}->https://api.telegram.org:443][total available: 0; route allocated: 0 of 2; total allocated: 0 of 100]
+Error removing old webhook
+	at org.telegram.telegrambots.util.WebhookUtils.clearWebhook(WebhookUtils.java:112)
+	at org.telegram.telegrambots.bots.TelegramLongPollingBot.clearWebhook(TelegramLongPollingBot.java:24)
+	at org.telegram.telegrambots.meta.TelegramBotsApi.registerBot(TelegramBotsApi.java:65)
+	at com.telegram.mybot.BotApp.main(BotApp.java:11)
+Caused by: org.telegram.telegrambots.meta.exceptions.TelegramApiException: Unable to execute deleteWebhook method
+	at org.telegram.telegrambots.bots.DefaultAbsSender.sendApiMethod(DefaultAbsSender.java:1074)
+	at org.telegram.telegrambots.meta.bots.AbsSender.execute(AbsSender.java:64)
+	at org.telegram.telegrambots.util.WebhookUtils.clearWebhook(WebhookUtils.java:107)
+	... 3 more
+Caused by: org.apache.http.conn.HttpHostConnectException: Connect to api.telegram.org:443 [api.telegram.org/173.244.209.150] failed: Connection timed out: connect
+	at org.apache.http.impl.conn.DefaultHttpClientConnectionOperator.connect(DefaultHttpClientConnectionOperator.java:156)
+	at org.apache.http.impl.conn.PoolingHttpClientConnectionManager.connect(PoolingHttpClientConnectionManager.java:376)
+	at org.apache.http.impl.execchain.MainClientExec.establishRoute(MainClientExec.java:393)
+	at org.apache.http.impl.execchain.MainClientExec.execute(MainClientExec.java:236)
+	at org.apache.http.impl.execchain.ProtocolExec.execute(ProtocolExec.java:186)
+	at org.apache.http.impl.execchain.RetryExec.execute(RetryExec.java:89)
+	at org.apache.http.impl.execchain.RedirectExec.execute(RedirectExec.java:110)
+	at org.apache.http.impl.client.InternalHttpClient.doExecute(InternalHttpClient.java:185)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:83)
+	at org.telegram.telegrambots.bots.DefaultAbsSender.sendHttpPostRequest(DefaultAbsSender.java:1106)
+	at org.telegram.telegrambots.bots.DefaultAbsSender.sendMethodRequest(DefaultAbsSender.java:1102)
+	at org.telegram.telegrambots.bots.DefaultAbsSender.sendApiMethod(DefaultAbsSender.java:1071)
+	... 5 more
+Caused by: java.net.ConnectException: Connection timed out: connect
+	at java.net.DualStackPlainSocketImpl.waitForConnect(Native Method)
+	at java.net.DualStackPlainSocketImpl.socketConnect(DualStackPlainSocketImpl.java:85)
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:350)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:206)
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:188)
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:172)
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.net.Socket.connect(Socket.java:589)
+	at org.apache.http.conn.ssl.SSLConnectionSocketFactory.connectSocket(SSLConnectionSocketFactory.java:368)
+	at org.apache.http.impl.conn.DefaultHttpClientConnectionOperator.connect(DefaultHttpClientConnectionOperator.java:142)
+	... 16 more
+
+Process finished with exit code 0
+",[],[],,2
+1147,How to get new chat member in super group?,open,2022-11-16 02:01:49,2023-03-29 07:25:07,,"I use spring-boot-starter:6.1 with bot long polling mode.
+
+I use #Message.getNewChatMembers() method to get new members of the group. 
+
+This method works for groups with less than 10,000 members, but not for super groups with more than 10,000 members.
+
+In a super group of over 10,000 people, I can't get any updates when a new member joins.
+
+Can anyone tell me how to get it
+
+<img width=""754"" alt=""image"" src=""https://user-images.githubusercontent.com/28617648/202064447-7882adcd-6441-45ce-84d0-33719d923915.png"">
+<img width=""597"" alt=""image"" src=""https://user-images.githubusercontent.com/28617648/202064502-7a818586-cb0f-45b6-aeb1-3bb218f50038.png"">
+",[],[],,5
+1146,conflict with spring webmvc,closed,2022-11-12 13:09:18,2022-11-12 13:17:52,2022-11-12 13:17:52,"in my bot i need to communicate with third-party api and when i sending request to api it just stop on creating ResponseEntity<>. 
+when i, trying to delete telegrambots dependency and comment bot logic it works successfully
+
+![image](https://user-images.githubusercontent.com/105144213/201475470-6e1c20b4-5182-4dfc-8cbe-0259d511d6a8.png)
+",[],[],,0
+1145,Dev,closed,2022-11-08 18:45:28,2022-11-08 18:45:49,2022-11-08 18:45:49,,[],[],,0
+1144,Support for Spring Boot 3,open,2022-11-05 12:05:13,2022-11-05 12:05:13,,"Spring Boot 3 will release in November 2022. It has [multiple breaking changes](https://spring.io/blog/2022/05/24/preparing-for-spring-boot-3-0) including a Java 17 and Jakarta EE 9 requirement. I have been experimenting with this over on [a fork](https://github.com/recursiveribbons/TelegramBots/tree/java-11-spring-boot-3), with moving everything to Java 11 and the Spring Boot Starter to Java 17, and Jakarta EE 9.",[],[],,0
+1143,Reworked some of the old comments in javadoc style,closed,2022-11-04 16:39:52,2022-11-07 18:15:41,2022-11-07 18:15:41,"The work is not finished yet, but I would like to hear maybe a positive assessment, so that I understand that it is worth doing this further.
+
+Thus it is possible to look at comments using IDE hints.
+![image](https://user-images.githubusercontent.com/41346424/200028949-b4e88436-46af-4c5a-9152-d003ffd2d7f5.png)
+
+I also did a little rearrangement of the class comments to make them look better in IDE tooltips.
+![image](https://user-images.githubusercontent.com/41346424/200027208-a4440b2d-38c7-4240-84d3-ca3fb769a960.png)
+",[],[],,0
+1141,How to resend photo already on the telegram servers?,closed,2022-10-30 18:25:46,2022-10-30 19:21:30,2022-10-30 19:21:15,"**Describe the bug**
+I see that we have filed photo in object SendPhoto only InputFile, How i can resent a photo that already on the telegram servers?
+
+``` @NonNull
+    private InputFile photo; ///< Photo to send. file_id as String to resend a photo that is already on the Telegram servers or URL to upload it
+```
+
+i have photo id, but when i tried do smth like down 
+``` SendPhoto msg = new SendPhoto();
+                msg.setChatId(chatId);
+                msg.setPhoto(database.photo.getPhotoId());
+                msg.setCaption(caption);
+                try {
+                    sendPhoto(msg); // Call method to send the photo with caption
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
+```
+
+i saw problem 
+```
+error: incompatible types: String cannot be converted to InputFile
+                msg.setPhoto(database.photo.getPhotoId());
+                                                           ^
+```
+
+API Telegram
+![image](https://user-images.githubusercontent.com/19304301/198895347-0583640c-1d50-49a2-8150-b85c9500b493.png)
+",[],[],,1
+1140,Can somebody PLEASE tell me why SendMediaGroup is not able to be used by sender.execute?,closed,2022-10-27 22:57:47,2022-10-28 21:04:29,2022-10-28 21:04:29,"I have been stuck on this issue for WEEKS. For some reason I am not able to use a SendMediaGroup object inside of MessageSender.execute(). It works fine with all other message types just not this one. Is this a bug with the api? Has anyone else encountered this? 
+
+![image](https://user-images.githubusercontent.com/48082925/198413257-31e0b0b2-f062-41f5-93f3-2df2c3bfbb56.png)
+",[],[],,0
+1139,"After running the bot for some time, it will throw httpclient timeout waiting for connection from pool",open,2022-10-25 09:17:24,2023-02-23 08:12:10,,"**Describe the bug**
+Sometimes I got this error, and I just have this problem once/twice in a week, it seems random, after I reboot my program, it works again. I searched around and some people say I don't close the http client correctly, but I just use the default long pooling bot settings.
+```
+class TelegramLongPollingBot2 extends TelegramLongPollingBot {}
+```
+I also found this issue, maybe this helps me, but my version is the 6.0.1, the newest version.
+https://github.com/rubenlagus/TelegramBots/issues/564
+
+**Screenshots**
+<img width=""1249"" alt=""image"" src=""https://user-images.githubusercontent.com/4775215/197734752-b21c5b72-ee59-47f5-b80c-cd2b0cebbc3a.png"">
+
+
+",[],[],,2
+1138,How to use the token correctly?,closed,2022-10-24 04:17:37,2022-10-24 15:25:22,2022-10-24 15:25:21,"Hello. I have little experience, my first bot. I cannot enter the token correctly so that it is not displayed in the code.
+
+It doesn't work that way.
+`  public TelegramBotController (@Value(""${botName}"") String botName) {
+        this.BOT_NAME = botName;
+    }`
+`  
+    @Override
+    public String getBotUsername() {
+        return BOT_NAME;
+    }`
+
+It doesn't work that way either.
+
+`    @Value(""${botNamel}"")
+    public String botName;
+    @Override
+    public String getBotUsername() {
+        return botName;
+    }`
+
+It only works when I specify it explicitly. This is very inconvenient. I reread everything, but I can't do it right.
+Is it possible to do something through the method object, without redefinition? Help me do it right or please tell me the library where it is implemented?",[],[],,1
+1137,Make AtomicBoolean variable final,open,2022-10-23 13:44:01,2022-10-23 13:44:01,,,[],[],,0
